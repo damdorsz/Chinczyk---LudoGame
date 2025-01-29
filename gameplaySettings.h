@@ -7,7 +7,8 @@
 #include <QVector>
 #include <QSet>
 #include <QMessageBox>
-#include "board.h"
+#include <QLineEdit>
+#include "PlayerColor.h"
 
 namespace Ui {
 class gameplaySettings;
@@ -26,10 +27,17 @@ public:
     void updateControlsForP4(int state);
     void validateSettings();
 
-    void setBoard(Board* board);
+    int getPlayers()const{return m_players;}
+    QVector<PlayerColor> getPlayerColors() const{return m_playerColors;}
+    QVector<QString> getNamePlayers() const{return m_namePlayers;}
+    QVector<QString> getPlayerModes() const{return  m_playerModes;}         //list
+    //QVector<QString> getSelectedColors() const{return  m_selectedColors;}   //set
 private:
     Ui::gameplaySettings *ui;
-    Board* m_board;
+    int m_players;
+    QVector<PlayerColor>m_playerColors;
+    QVector<QString> m_namePlayers;
+    QVector<QString> m_playerModes;
 };
 
 #endif // GAMEPLAYSETTINGS_H

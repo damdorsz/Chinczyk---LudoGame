@@ -9,21 +9,44 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    board.cpp \
+    About.cpp \
+    Board.cpp \
+    Dice.cpp \
+    Game.cpp \
+    GameScreen.cpp \
+    GameWindow.cpp \
+    Path.cpp \
+    Pawn.cpp \
+    SaveGameEngine.cpp \
+    ValueError.cpp \
     gameplaySettings.cpp \
     main.cpp \
-    mainwindow.cpp
+    paint_helper.cpp
 
 HEADERS += \
-    board.h \
+    About.h \
+    Board.h \
+    Dice.h \
+    Game.h \
+    GameScreen.h \
+    GameWindow.h \
+    Path.h \
+    Pawn.h \
+    PlayerColor.h \
+    SaveGameEngine.h \
+    ValueError.h \
     gameplaySettings.h \
-    mainwindow.h
+    paint_helper.h
 
 FORMS += \
+    about.ui \
     gameplaSettings.ui \
-    mainwindow.ui
+    welcome.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    Resources.qrc
