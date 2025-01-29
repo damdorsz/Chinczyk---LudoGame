@@ -51,6 +51,13 @@ QVector<QPoint> Path::path = {
     QPoint(4, 5)
 };
 
+QVector<QPoint> Path::endZone = {
+    QPoint(1, 5),
+    QPoint(2, 5),
+    QPoint(3, 5),
+    QPoint(4, 5)
+};
+
 const unsigned int Path::MAX_REL = Path::path.size() - 1;
 
 QPoint Path::getAbsoluteCordinates(unsigned int rel) {
@@ -59,6 +66,15 @@ QPoint Path::getAbsoluteCordinates(unsigned int rel) {
         : Invalid argument : rel == %1").arg(rel));
 
     return path[rel];
+}
+
+QPoint Path::getEndZoneCordinates(unsigned int rel)
+{
+    if(rel >= (unsigned int)path.size())
+        ValueError::raise_new(QString("Path::getEndZoneCordinates(unsigned long int) \
+        : Invalid argument : rel == %1").arg(rel));
+
+    return endZone[rel];
 }
 
 QPoint Path::rotatePointToRight(QPoint point) {

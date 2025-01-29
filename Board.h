@@ -62,6 +62,8 @@ public:
 
     static QVector<PlayerColor> getTabGraczyKolor();
 
+    static QPoint getPawnEndZone(PlayerColor color,unsigned int relpos);
+
 private:
     unsigned int players_count {}; //Count of players
     QVector<Pawn*> mPawns {}; //Vector holding pawn handles

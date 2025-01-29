@@ -218,13 +218,10 @@ bool Game::playMove(Pawn* pawn, int diceFace) {
     // Wykonaj ruch
     pawn->changePosition(futureRel);
 
-    // // Sprawdź warunki zwycięstwa dla wszystkich graczy
-    // for (auto color : {PlayerColor::RED, PlayerColor::BLUE, PlayerColor::YELLOW, PlayerColor::GREEN}) {
-    //     if (checkVictoryConditions(color)) {
-    //         announceVictory(color);
-    //         break; // Zakończ po pierwszym zwycięstwie
-    //     }
-    // }
+    // Sprawdź warunki zwycięstwa
+    if (checkVictoryConditions(pawn->getColor()))
+            announceVictory(pawn->getColor());
+
 
     if(toClash != nullptr)
         toClash->goBackHome();
@@ -335,14 +332,16 @@ bool Game::checkVictoryConditions(PlayerColor color) {
     QVector<Pawn*> pawns = mBoard->getAllPawns();
 
     for (auto pawn : pawns) {
+
         if (pawn->getColor() != color) continue;
+        if( pawn->getRelPosition() < 40) continue;
 
-        QPoint pawnPos = mBoard->getPawnCoordinates(color, pawn->getRelPosition());
+        QPoint pawnPos = mBoard->getPawnEndZone(color, pawn->getRelPosition());
         int distance = abs(pawnPos.x() - 5) + abs(pawnPos.y() - 5);
-
         // Sprawdź czy pionek jest w strefie końcowej (odległość 0-3 od środka)
         if (distance <= 4) {
             pawnsInEndZone++;
+            qDebug() << "Pionkow w strefie: " << pawnsInEndZone;
         }
     }
 

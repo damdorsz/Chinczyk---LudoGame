@@ -117,7 +117,6 @@ unsigned int Board::getPlayersCount() {
  * This should not be called when the pawn is at home (relpos == -1) */
 QPoint Board::getPawnCoordinates(PlayerColor color,unsigned int relpos){
     qInfo() << "Board::getPawnCoordinates(PlayerColor, int) : relpos == " << relpos;
-
     //QVector<PlayerColor>& colors = b->mTablicaGraczyKolor;
     if (color == mTablicaGraczyKolor[0]) {
         return Path::getAbsoluteCordinates(relpos);
@@ -130,6 +129,25 @@ QPoint Board::getPawnCoordinates(PlayerColor color,unsigned int relpos){
     } else {
         // Obsługa błędnego koloru gracza
         ValueError::raise_new(QString("Board::getPawnCoordinates(PlayerColor, int) : Invalid PlayerColor"));
+    }
+#pragma GCC diagnostic warning "-Wreturn-type"
+}
+#pragma GCC diagnostic warning "-Wreturn-type"
+
+QPoint Board::getPawnEndZone(PlayerColor color,unsigned int relpos) {
+    relpos -= 40;
+    qInfo() << "Board::getPawnEndZone(PlayerColor, int) : relpos == " << relpos;
+    if (color == mTablicaGraczyKolor[0]) {
+        return Path::getEndZoneCordinates(relpos);
+    } else if (color == mTablicaGraczyKolor[2]) {
+        return Path::rotatePointToRight(Path::getEndZoneCordinates(relpos));
+    } else if (color == mTablicaGraczyKolor[1]) {
+        return Path::rotatePointToRight(Path::getEndZoneCordinates(relpos), 2);
+    } else if (color == mTablicaGraczyKolor[3]) {
+        return Path::rotatePointToRight(Path::getEndZoneCordinates(relpos), 3);
+    } else {
+        // Obsługa błędnego koloru gracza
+        ValueError::raise_new(QString("Board::getPawnEndZone(PlayerColor, int) : Invalid PlayerColor"));
     }
 #pragma GCC diagnostic warning "-Wreturn-type"
 }

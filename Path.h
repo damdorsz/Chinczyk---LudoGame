@@ -20,8 +20,11 @@ public:
     static QPoint rotatePointToRight(QPoint p);
     static QPoint rotatePointToRight(QPoint p, int times);
     //QVector<QPoint> getEndZone(PlayerColor color);
+    static QPoint getEndZoneCordinates(unsigned int rel);
+
 
 private:
+    static QVector<QPoint> endZone;
     static QVector<QPoint> path; //Data structure to store the coordinates
     static const int TOP = 10; //Total number of cells in a row (or colomn)
     //QVector<QPoint> endZone;
