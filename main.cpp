@@ -63,9 +63,10 @@ void startClick(Ui::WelcomeWindow &ui, QMainWindow &welcomeWindow) {
         unsigned int players = m_gameplaySettings->getPlayers();
         QVector<PlayerColor> tablicaKolorowGraczy = m_gameplaySettings->getPlayerColors();
         QVector<QString> tablicaNazwGraczy = m_gameplaySettings->getNamePlayers();
+        QVector<QString> tablicaModeGamers = m_gameplaySettings->getPlayerModes();
         // Kontynuacja tylko, jeśli liczba graczy jest poprawna
         if (players > 0) {
-            gameWin = new GameWindow(players,tablicaNazwGraczy,tablicaKolorowGraczy);
+            gameWin = new GameWindow(players,tablicaNazwGraczy,tablicaKolorowGraczy,tablicaModeGamers);
             gameWin->show();
             welcomeWindow.close();
 

@@ -8,9 +8,24 @@ gameplaySettings::gameplaySettings(QWidget *parent)
 {
     ui->setupUi(this);
 
-     // ui->radioButtonP2_2->setChecked(true);
-     // ui->radioButtonP3_2->setChecked(true);
-     // ui->radioButtonP4_2->setChecked(true);
+    // Tworzenie grup przycisków
+    buttonGroupP2 = new QButtonGroup(this);
+    buttonGroupP3 = new QButtonGroup(this);
+    buttonGroupP4 = new QButtonGroup(this);
+
+    // Dodawanie przycisków do odpowiednich grup
+    buttonGroupP2->addButton(ui->radioButtonP2);
+    buttonGroupP2->addButton(ui->radioButtonP2_2);
+
+    buttonGroupP3->addButton(ui->radioButtonP3);
+    buttonGroupP3->addButton(ui->radioButtonP3_2);
+
+    buttonGroupP4->addButton(ui->radioButtonP4);
+    buttonGroupP4->addButton(ui->radioButtonP4_2);
+
+     ui->radioButtonP2_2->setChecked(true);
+     ui->radioButtonP3_2->setChecked(true);
+     ui->radioButtonP4_2->setChecked(true);
 
     connect(ui->checkBoxP3, &QCheckBox::stateChanged, this, &gameplaySettings::updateControlsForP3);
     connect(ui->checkBoxP4, &QCheckBox::stateChanged, this, &gameplaySettings::updateControlsForP4);
@@ -105,12 +120,12 @@ void gameplaySettings::updateAvailableColors()
 void gameplaySettings::updateControlsForP3(int state)
 {
     bool isEnabled = (state == Qt::Checked);
-    // if (ui->radioButtonP3) {
-    //     ui->radioButtonP3->setEnabled(isEnabled);
-    // }
-    // if (ui->radioButtonP3_2) {
-    //     ui->radioButtonP3_2->setEnabled(isEnabled);
-    // }
+    if (ui->radioButtonP3) {
+        ui->radioButtonP3->setEnabled(isEnabled);
+    }
+    if (ui->radioButtonP3_2) {
+        ui->radioButtonP3_2->setEnabled(isEnabled);
+    }
     if (ui->comboBoxP3) {
         ui->comboBoxP3->setEnabled(isEnabled);
     }
@@ -122,12 +137,12 @@ void gameplaySettings::updateControlsForP3(int state)
 void gameplaySettings::updateControlsForP4(int state)
 {
     bool isEnabled = (state == Qt::Checked);
-    // if (ui->radioButtonP4) {
-    //     ui->radioButtonP4->setEnabled(isEnabled);
-    // }
-    // if (ui->radioButtonP4_2) {
-    //     ui->radioButtonP4_2->setEnabled(isEnabled);
-    // }
+    if (ui->radioButtonP4) {
+        ui->radioButtonP4->setEnabled(isEnabled);
+    }
+    if (ui->radioButtonP4_2) {
+        ui->radioButtonP4_2->setEnabled(isEnabled);
+    }
     if (ui->comboBoxP4) {
         ui->comboBoxP4->setEnabled(isEnabled);
     }
@@ -140,7 +155,7 @@ void gameplaySettings::validateSettings() {
 
     QVector<QString> namePlayers;
     QVector<PlayerColor> playerColors = {PlayerColor::WHITE,PlayerColor::WHITE,PlayerColor::WHITE,PlayerColor::WHITE};
-    // QVector<QString> playerModes;
+    QVector<QString> playerModes;
     int numberOfPlayers = 0;
 
     for (int i = 1; i <= 4; i++) {
@@ -172,23 +187,26 @@ void gameplaySettings::validateSettings() {
                 playerColors[i - 1] = PlayerColor::BLUE;
         }
 
-        // QString radioButton1Name = QString("radioButtonP%1").arg(i);
-        // QString radioButton2Name = QString("radioButtonP%1_2").arg(i);
+        if(i == 1){
+            playerModes.append("HUMAN");
+        } else {
+            QButtonGroup* currentGroup = nullptr;
+            switch(i) {
+            case 2: currentGroup = buttonGroupP2; break;
+            case 3: currentGroup = buttonGroupP3; break;
+            case 4: currentGroup = buttonGroupP4; break;
+            }
 
-        // QRadioButton *radioButton1 = findChild<QRadioButton *>(radioButton1Name);
-        // QRadioButton *radioButton2 = findChild<QRadioButton *>(radioButton2Name);
-
-        // if (radioButton1 && radioButton2) {
-        //     if (radioButton1->isChecked()) {
-        //         playerModes.append("HUMAN");
-        //     } else if (radioButton2->isChecked()) {
-        //         playerModes.append("CPU");
-        //     } else {
-        //         QMessageBox::warning(this, "Invalid Selection",
-        //                              QString("Please select a game mode"));
-        //         return;
-        //     }
-        // }
+            if (currentGroup) {
+                QAbstractButton* selectedButton = currentGroup->checkedButton();
+                if (!selectedButton) {
+                    QMessageBox::warning(this, "Invalid Selection",
+                                         QString("Please select a game mode for Player %1").arg(i));
+                    return;
+                }
+                playerModes.append(selectedButton->text());
+            }
+        }
 
         QString lineEditName = QString("lineEditP%1").arg(i);
         QLineEdit *lineEdit = findChild<QLineEdit *>(lineEditName);
@@ -217,7 +235,7 @@ void gameplaySettings::validateSettings() {
     m_players = numberOfPlayers;
     m_playerColors = playerColors;
     m_namePlayers = namePlayers;
-    // m_playerModes = playerModes;
+    m_playerModes = playerModes;
     accept(); // Akceptuj ustawienia tylko po pełnej walidacji
 }
 

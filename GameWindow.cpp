@@ -24,8 +24,8 @@ const QColor GameWindow::COLOR_YELLOW_LIGHT = QColor (255,250,153);
 const QColor GameWindow::COLOR_BLUE_LIGHT = QColor (99,218,220);
 const QColor GameWindow::COLOR_GREEN_LIGHT = QColor (148,237,148);
 
-GameWindow::GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy, QVector<PlayerColor> tablicaGraczyKolor = {PlayerColor::RED, PlayerColor::YELLOW, PlayerColor::BLUE, PlayerColor::GREEN}) :
-    mGame {new Game(players_count,tablicaGraczyKolor)},
+GameWindow::GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy, QVector<PlayerColor> tablicaGraczyKolor, QVector<QString> tablicaModeGamers) :
+    mGame {new Game(players_count,tablicaGraczyKolor,tablicaModeGamers)},
     mBoard {mGame->getGameBoard()},
     state {ROLLING},
     mScreen (new GameScreen(this, tablicaGraczyKolor)),
@@ -38,19 +38,6 @@ GameWindow::GameWindow(unsigned int players_count, QVector<QString> tablicaNazwG
 
     init();
 }
-
-// GameWindow::GameWindow(unsigned int players_count) :
-// mGame {new Game(players_count)},
-// mBoard {mGame->getGameBoard()},
-// state {ROLLING},
-// mScreen (new GameScreen(this)),
-// footer {new QWidget(this)},
-// footerLayout {new QVBoxLayout()},
-// dice {new Dice(nullptr, 6)},
-// hintLabel {new QLabel()} {
-
-//     init();
-// }
 
 GameWindow::GameWindow(SaveGameEngine *save) :
     state {ROLLING},
@@ -163,10 +150,6 @@ void GameWindow::updateUi() {
             dice->setColor(COLOR_GREEN_LIGHT);
             break;
     }
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     if (state == ROLLING) {
         hintLabel->setText(
             QString("%1: Roll the dice!")
@@ -175,8 +158,6 @@ void GameWindow::updateUi() {
         for (auto p : mBoard->getAllPawns())
             p->setEnabled(false);
         dice->setEnabled(true);
-<<<<<<< Updated upstream
-=======
         if(mGame->isCurrentPlayerAI())
         {
             hintLabel->setText(QString("CPU is making a move..."));
@@ -185,7 +166,6 @@ void GameWindow::updateUi() {
             });
 
         }
->>>>>>> Stashed changes
 
     } else if (state == MOVING) {
         hintLabel->setText(
@@ -249,37 +229,10 @@ void GameWindow::animateDiceRoll() {
 
 void GameWindow::diceAnimationFinished() {
     qDebug() << "GameWindow::diceAnimationFinished()";
-
     dice->setValue(mGame->rollDice());
+    int diceValue = mGame->getLastDiceValue();
+    QVector<Pawn*> playables = mGame->getPlayablePawns(diceValue);
 
-    QVector<Pawn*> playables = mGame->getPlayablePawns(mGame->getLastDiceValue());
-
-<<<<<<< Updated upstream
-    if(playables.size() == 0) {
-        mGame->changeCurrentPlayer(); //We got no pawns worth moving
-        //But we need to wait for a second!
-
-        QTimer *timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, this, [timer, this](){
-            this->updateUi();
-            delete timer; //No need to stop it, just delete it
-        });
-
-        timer->start(700);
-        this->state = ROLLING;
-        return; //It makes it look like we're still animating, but it's just a small pause between dice rollings
-
-    } else if(playables.size() == 1) { //Only a singal move available, rather not ask for it
-        pawnChosen(playables[0]); //Auto choosen
-
-    } else {
-        for (auto p : playables)
-            p->setEnabled(true);
-
-        state = MOVING;
-    }
-
-=======
     if (playables.isEmpty()) {
         mGame->changeCurrentPlayer();
         QTimer::singleShot(700, this, [this]() {
@@ -318,7 +271,6 @@ void GameWindow::diceAnimationFinished() {
             state = MOVING;
         }
     }
->>>>>>> Stashed changes
     updateUi();
 }
 
@@ -455,12 +407,6 @@ void GameWindow::pawnClashed(Pawn *p) { // komenatrz 260125_1310
     }
     p->setGeometry(painthelp::getPawnHomePosGeometry(p->getColor(), ((p->getId()+1) % 4) + 1,which));
 }
-
-// void GameWindow::pawnClashed(Pawn *p) {
-//     p->changePosition(Pawn::HOME);
-//     //This line is used in the the Constructor of Pawn and has details in the comment there
-//     p->setGeometry(painthelp::getPawnHomePosGeometry(p->getColor(), ((p->getId()+1) % 4) + 1));
-// }
 
 void GameWindow::saveRequested() {
     saveGame();

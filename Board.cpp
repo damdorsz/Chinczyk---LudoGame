@@ -57,41 +57,6 @@ Board::Board(unsigned int players,QVector<PlayerColor> tablicaGraczyKolor) :
     }
 }
 
-// Board::Board(unsigned int players) :
-// players_count(players) {
-
-//     /* Initialize the player vector */
-//     #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-//     switch(players) {
-//         case 4:
-//             mPawns.append(new Pawn(PlayerColor::GREEN, 0));
-//             mPawns.append(new Pawn(PlayerColor::GREEN, 1));
-//             mPawns.append(new Pawn(PlayerColor::GREEN, 2));
-//             mPawns.append(new Pawn(PlayerColor::GREEN, 3));
-//         case 3:
-//             mPawns.append(new Pawn(PlayerColor::YELLOW, 4));
-//             mPawns.append(new Pawn(PlayerColor::YELLOW, 5));
-//             mPawns.append(new Pawn(PlayerColor::YELLOW, 6));
-//             mPawns.append(new Pawn(PlayerColor::YELLOW, 7));
-//         case 2:
-//             mPawns.append(new Pawn(PlayerColor::BLUE, 8));
-//             mPawns.append(new Pawn(PlayerColor::BLUE, 9));
-//             mPawns.append(new Pawn(PlayerColor::BLUE, 10));
-//             mPawns.append(new Pawn(PlayerColor::BLUE, 11));
-
-//             mPawns.append(new Pawn(PlayerColor::RED, 12));
-//             mPawns.append(new Pawn(PlayerColor::RED, 13));
-//             mPawns.append(new Pawn(PlayerColor::RED, 14));
-//             mPawns.append(new Pawn(PlayerColor::RED, 15));
-//             break;
-
-//         default:
-//             ValueError::raise_new(QString("Invalid number of players. Expected value \
-//             between 2 to 4 but got %1").arg(players));
-
-//         #pragma GCC diagnostic warning "-Wimplicit-fallthrough"
-//     }
-// }
 
 Board::Board(SaveGameEngine *save) {
     players_count = save->readInt();
@@ -153,32 +118,6 @@ QPoint Board::getPawnEndZone(PlayerColor color,unsigned int relpos) {
 }
 #pragma GCC diagnostic warning "-Wreturn-type"
 
-// /* Returns the coordinates of a pawn if it's color and relpos were same as given
-//  * This should not be called when the pawn is at home (relpos == -1) */
-// QPoint Board::getPawnCoordinates(PlayerColor color, unsigned int relpos) {
-//     qInfo() << "Board::getPawnCoordinates(PlayerColor, int) : relpos == " << relpos;
-
-//     if (relpos > Path::MAX_REL)
-//         ValueError::raise_new(QString("Board::getPawnCoordinates(PlayerColor, unsigned int) \
-//         : Invalid value for relpos == %1").arg(relpos));
-
-//     switch (color) {
-//         case PlayerColor::RED:
-//             return Path::getAbsoluteCordinates(relpos);
-//         case PlayerColor::YELLOW:
-//             return Path::rotatePointToRight(Path::getAbsoluteCordinates(relpos));
-//         case PlayerColor::BLUE:
-//             return Path::rotatePointToRight(Path::getAbsoluteCordinates(relpos), 2);
-//         case PlayerColor::GREEN:
-//             return Path::rotatePointToRight(Path::getAbsoluteCordinates(relpos), 3);
-
-//         //This will never happen
-//         default:
-//             ValueError::raise_new(QString("Board::getPawnCoordinates(PlayerColor, int) : Invalid PlayerColor"));
-//         }
-//     #pragma GCC diagnostic ignored "-Wreturn-type"
-// }
-// #pragma GCC diagnostic warning "-Wreturn-type"
 
 /* Returns the coordinates of the pawn passed by pointer. Pawn is not required to be on board
  * This should not be called when the pawn is at home */
@@ -228,32 +167,3 @@ QVector<Pawn*> Board::getAllPawnsByColor(PlayerColor color) {
 
     return result;
 }
-
-/* Returns a pointer to the Pawn identified by it's color and index (1~4)
- * Returns the nullptr if the pawn does not exist */
-// Pawn* Board::getPawn(PlayerColor color, unsigned int which) {
-//     if(color == PlayerColor::YELLOW && players_count == 2)
-//         return nullptr;
-//     if(color == PlayerColor::GREEN && players_count != 4)
-//         return nullptr;
-//     if(which > 4)
-//         return nullptr;
-
-//     int id {};
-//     switch (color) {
-//         case PlayerColor::GREEN:
-//             id = 0;
-//             break;
-//         case PlayerColor::YELLOW:
-//             id = 4;
-//             break;
-//         case PlayerColor::BLUE:
-//             id = 8;
-//             break;
-//         case PlayerColor::RED:
-//             id = 12;
-//             break;
-//     }
-
-//     return mPawns[id+which-1];
-// }
