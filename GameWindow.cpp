@@ -271,31 +271,37 @@ void GameWindow::diceAnimationFinished() {
     int diceValue = mGame->getLastDiceValue();
     QVector<Pawn*> playables = mGame->getPlayablePawns(diceValue);
 
-    if(playables.size() == 0) {
+    if (playables.isEmpty()) {
         mGame->changeCurrentPlayer();
-        QTimer *timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, this, [timer, this](){
+        QTimer::singleShot(700, this, [this]() {
+            this->state = ROLLING;
             this->updateUi();
-            delete timer;
         });
-        timer->start(700);
-        this->state = ROLLING;
         return;
     }
 
-    if(mGame->isCurrentPlayerAI()) {
-        // Jeśli to AI, wykonaj ruch po krótkim opóźnieniu
-        QTimer *timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, this, [timer, this, diceValue](){
-            mGameAI->makeMove(diceValue);
-            this->state = ROLLING;
-            this->updateUi();
-            delete timer;
+    if (mGame->isCurrentPlayerAI()) {
+        state = MOVING;
+
+        QTimer::singleShot(500, this, [this, diceValue]() {
+            GameAI* ai = new GameAI(mGame);
+            Pawn* selectedPawn = ai->makeMove(diceValue);
+
+            if (selectedPawn) {
+                // Zamiast bezpośrednio wywoływać playMove, użyj pawnChosen
+                pawnChosen(selectedPawn);
+                qDebug() << "GameWindow: AI wykonało ruch pionkiem:" << (int)selectedPawn->getColor();
+            } else {
+                mGame->changeCurrentPlayer();
+                state = ROLLING;
+                updateUi();
+                dice->setEnabled(true);
+            }
+
+            delete ai;
         });
-        timer->start(500);
     } else {
-        // Logika dla gracza ludzkiego
-        if(playables.size() == 1) {
+        if (playables.size() == 1) {
             pawnChosen(playables[0]);
         } else {
             for (auto p : playables)

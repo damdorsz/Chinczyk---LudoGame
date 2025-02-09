@@ -11,44 +11,24 @@ GameAI::GameAI(Game* game)
 {
 }
 
-void GameAI::makeMove(int diceValue) {
+Pawn* GameAI::makeMove(int diceValue) {
     qDebug() << "AI rzuca kostką, wynik:" << diceValue;
     QVector<Pawn*> playablePawns = mGame->getPlayablePawns(diceValue);
-    qDebug() << "AI rzuca kostką, wynik:" << diceValue;
+
     if (playablePawns.isEmpty()) {
         qDebug() << "Brak dostępnych pionków do ruchu. AI kończy turę.";
-        // Dodajemy małe opóźnienie przed zmianą gracza
-        QTimer::singleShot(500, [this]() {
-            mGame->changeCurrentPlayer();
-        });
-        return;
-    } else qDebug() << "Dostępne pionki na plansze.";
+        return nullptr;
+    }
 
-    // Wybierz najlepszy ruch według strategii
+    // Wybór najlepszego pionka do ruchu
     Pawn* selectedPawn = selectBestMove(playablePawns, diceValue);
     if (selectedPawn == nullptr) {
-        qDebug() << "Nie znaleziono pionka do ruchu.";
-        QTimer::singleShot(500, [this]() {
-            mGame->changeCurrentPlayer();
-        });
-        return;
-    } else qDebug() << "Znaleziono pionka do ruchu.";
-
-    // Wykonaj ruch
-    bool reroll = mGame->playMove(selectedPawn, diceValue);
-    qDebug() << "AI wykonuje ruch pionkiem:" << (int)selectedPawn->getColor();
-
-    // Jeśli dostajemy dodatkowy ruch, wykonaj go po małym opóźnieniu
-    if (reroll) {
-        QTimer::singleShot(1000, [this, diceValue]() {
-            makeMove(diceValue);
-        });
-    } else {
-        // Zmiana gracza po małym opóźnieniu
-        QTimer::singleShot(500, [this]() {
-            mGame->changeCurrentPlayer();
-        });
+        qDebug() << "AI nie znalazło pionka do ruchu. Tura kończy się.";
+        return nullptr;
     }
+
+    qDebug() << "AI wybrało pionek:" << (int)selectedPawn->getColor();
+    return selectedPawn;
 }
 
 Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {

@@ -12,7 +12,7 @@ class GameAI   // Dziedziczymy po QObject, żeby móc używać QTimer
 {
 public:
     GameAI(Game* game);  // Dodajemy explicit i parent
-    void makeMove(int diceValue);
+    Pawn* makeMove(int diceValue);
 
 private:
     Pawn* selectBestMove(const QVector<Pawn*>& pawns, int diceValue);

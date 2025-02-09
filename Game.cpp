@@ -124,74 +124,55 @@ bool Game::isFinished() {
 }
 
 
-    bool Game::playMove(Pawn* pawn, int diceFace) {
-        qInfo() << "Game::playMove(Pawn*, int)";
+bool Game::playMove(Pawn* pawn, int diceFace) {
+    qInfo() << "Game::playMove(Pawn*, int)";
+    if (pawn->getRelPosition() + diceFace > Pawn::DEST) {
+        qDebug() << "Prevented move that would exceed board limit";
+        return false;
+    }
 
-        if (pawn->getRelPosition() + diceFace > Pawn::DEST) {
-            qDebug() << "Prevented move that would exceed board limit";
-            return false;
-        }
+    QVector<Pawn*> playablePawns = getPlayablePawns(diceFace);
+    if (playablePawns.isEmpty()) {
+        handleNoMoves();
+        return false;
+    }
 
-        // Sprawdź, czy ruch jest w ogóle możliwy
-        QVector<Pawn*> playablePawns = getPlayablePawns(diceFace);
-        if (playablePawns.isEmpty()) {
-            handleNoMoves();
-            return false;
-        }
+    if (!playablePawns.contains(pawn)) {
+        qDebug() << "Wybrany pionek nie może wykonać ruchu";
+        return false;
+    }
 
-        // Sprawdź, czy wybrany pionek jest wśród możliwych do ruchu
-        if (!playablePawns.contains(pawn)) {
-            qDebug() << "Wybrany pionek nie może wykonać ruchu";
-            return false;
-        }
+    unsigned int futureRel = Game::predictRel(pawn, diceFace);
+    bool re_turn = diceFace == 6;
+    Pawn* toClash = nullptr;
 
-        unsigned int futureRel = Game::predictRel(pawn, diceFace);
-        bool re_turn = diceFace == 6;
-        Pawn* toClash = nullptr;
-
-        if (futureRel != Pawn::DEST) {
-            QVector<Pawn*> pawnsThere = mBoard->getPawnsAt(
-                mBoard->getPawnCoordinates(
-                    pawn->getColor(),
-                    futureRel
-                    )
-                );
-            if (pawnsThere.size() == 1 && pawnsThere[0]->getColor() != pawn->getColor()) {
-                toClash = pawnsThere[0];
-                re_turn = true;
-            }
-        } else {
+    if (futureRel != Pawn::DEST) {
+        QVector<Pawn*> pawnsThere = mBoard->getPawnsAt(
+            mBoard->getPawnCoordinates(
+                pawn->getColor(),
+                futureRel
+                )
+            );
+        if (pawnsThere.size() == 1 && pawnsThere[0]->getColor() != pawn->getColor()) {
+            toClash = pawnsThere[0];
             re_turn = true;
         }
-
-        // Wykonaj ruch
-        if (isCurrentPlayerAI()) {
-            // Jeśli to ruch AI, dodaj małe opóźnienie dla lepszej wizualizacji
-            //QTimer::singleShot(300, [this, pawn, futureRel]() {
-                pawn->changePosition(futureRel);
-            //});
-        } else {
-            pawn->changePosition(futureRel);
-        }
-
-        // Sprawdź warunki zwycięstwa
-        if (checkVictoryConditions(pawn->getColor())) {
-            announceVictory(pawn->getColor());
-        }
-
-        // Obsługa zbicia pionka
-        if (toClash != nullptr) {
-            if (isCurrentPlayerAI()) {
-                //QTimer::singleShot(500, [toClash]() {
-                    toClash->goBackHome();
-                //});
-            } else {
-                toClash->goBackHome();
-            }
-        }
-
-        return re_turn;
+    } else {
+        re_turn = true;
     }
+
+    pawn->changePosition(futureRel);
+
+    if (checkVictoryConditions(pawn->getColor())) {
+        announceVictory(pawn->getColor());
+    }
+
+    if (toClash != nullptr) {
+        toClash->goBackHome();
+    }
+
+    return re_turn;
+}
 
 
 
