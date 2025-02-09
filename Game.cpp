@@ -7,6 +7,7 @@
 #include <PlayerColor.h>
 #include <SaveGameEngine.h>
 #include <ValueError.h>
+#include <QTimer>
 
 Game::Game(unsigned int players, QVector<PlayerColor> tablicaKolorowGraczy) :
     players_count(players), mBoard(new Board {players,tablicaKolorowGraczy}),
@@ -178,6 +179,7 @@ bool Game::isFinished() {
 bool Game::playMove(Pawn* pawn, int diceFace) {
     qInfo() << "Game::playMove(Pawn*, int)";
 
+<<<<<<< Updated upstream
     if(pawn->getRelPosition() + diceFace > Pawn::DEST) {
         qDebug() << "Prevented move that would exceed board limit";
         return false;
@@ -221,6 +223,58 @@ bool Game::playMove(Pawn* pawn, int diceFace) {
     // Sprawdź warunki zwycięstwa
     if (checkVictoryConditions(pawn->getColor()))
             announceVictory(pawn->getColor());
+=======
+bool Game::playMove(Pawn* pawn, int diceFace) {
+    qInfo() << "Game::playMove(Pawn*, int)";
+    if (pawn->getRelPosition() + diceFace > Pawn::DEST) {
+        qDebug() << "Prevented move that would exceed board limit";
+        return false;
+    }
+
+    QVector<Pawn*> playablePawns = getPlayablePawns(diceFace);
+    if (playablePawns.isEmpty()) {
+        handleNoMoves();
+        return false;
+    }
+
+    if (!playablePawns.contains(pawn)) {
+        qDebug() << "Wybrany pionek nie może wykonać ruchu";
+        return false;
+    }
+
+    unsigned int futureRel = Game::predictRel(pawn, diceFace);
+    bool re_turn = diceFace == 6;
+    Pawn* toClash = nullptr;
+
+    if (futureRel != Pawn::DEST) {
+        QVector<Pawn*> pawnsThere = mBoard->getPawnsAt(
+            mBoard->getPawnCoordinates(
+                pawn->getColor(),
+                futureRel
+                )
+            );
+        if (pawnsThere.size() == 1 && pawnsThere[0]->getColor() != pawn->getColor()) {
+            toClash = pawnsThere[0];
+            re_turn = true;
+        }
+    } else {
+        re_turn = true;
+    }
+
+    pawn->changePosition(futureRel);
+
+    if (checkVictoryConditions(pawn->getColor())) {
+        announceVictory(pawn->getColor());
+    }
+
+    if (toClash != nullptr) {
+        toClash->goBackHome();
+    }
+
+    return re_turn;
+}
+
+>>>>>>> Stashed changes
 
 
     if(toClash != nullptr)
