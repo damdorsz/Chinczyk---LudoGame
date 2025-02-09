@@ -18,7 +18,7 @@ Pawn::Pawn(PlayerColor color, int id,int position) :
 
 }
 
-
+// test
 
 Pawn::Pawn(SaveGameEngine *save) {
     this->mColor = static_cast<PlayerColor>(save->readInt());
