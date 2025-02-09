@@ -19,6 +19,7 @@ SOURCES += \
     Pawn.cpp \
     SaveGameEngine.cpp \
     ValueError.cpp \
+    gameai.cpp \
     gameplaySettings.cpp \
     main.cpp \
     paint_helper.cpp
@@ -35,6 +36,7 @@ HEADERS += \
     PlayerColor.h \
     SaveGameEngine.h \
     ValueError.h \
+    gameai.h \
     gameplaySettings.h \
     paint_helper.h
 

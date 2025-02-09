@@ -191,7 +191,7 @@
          <item>
           <widget class="QRadioButton" name="radioButtonP2">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>HUMAN</string>
@@ -201,7 +201,7 @@
          <item>
           <widget class="QRadioButton" name="radioButtonP2_2">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>CPU</string>
@@ -285,7 +285,7 @@
          <item>
           <widget class="QRadioButton" name="radioButtonP3">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>HUMAN</string>
@@ -295,7 +295,7 @@
          <item>
           <widget class="QRadioButton" name="radioButtonP3_2">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>CPU</string>
@@ -379,7 +379,7 @@
          <item>
           <widget class="QRadioButton" name="radioButtonP4">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>HUMAN</string>
@@ -389,7 +389,7 @@
          <item>
           <widget class="QRadioButton" name="radioButtonP4_2">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>CPU</string>

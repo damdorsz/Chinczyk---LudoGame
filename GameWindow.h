@@ -24,6 +24,7 @@
 
 #include <GameScreen.h>
 #include "PlayerColor.h"
+#include "gameai.h"
 
 class Game;
 class Board;
@@ -84,7 +85,7 @@ public:
     static const int DICE_SHAKE_DISTANCE = 25;
 
     //Constructor and destructor
-    explicit GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy , QVector<PlayerColor> tablicaGraczy);
+    explicit GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy , QVector<PlayerColor> tablicaGraczy,QVector<QString> tablicaModeGamers);
 
     //Constructs from save state
     explicit GameWindow(SaveGameEngine *save);
@@ -174,6 +175,7 @@ private:
 
     //Checking whether the player the ability to move pawns
     //bool areMovesAvailable(int rolledNumber);
+    GameAI* mGameAI;
 protected:
     void closeEvent(QCloseEvent*);
 };

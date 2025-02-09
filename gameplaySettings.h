@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QLineEdit>
 #include "PlayerColor.h"
+#include <QButtonGroup>
 
 namespace Ui {
 class gameplaySettings;
@@ -30,14 +31,16 @@ public:
     int getPlayers()const{return m_players;}
     QVector<PlayerColor> getPlayerColors() const{return m_playerColors;}
     QVector<QString> getNamePlayers() const{return m_namePlayers;}
-    QVector<QString> getPlayerModes() const{return  m_playerModes;}         //list
-    //QVector<QString> getSelectedColors() const{return  m_selectedColors;}   //set
+    QVector<QString> getPlayerModes() const{return  m_playerModes;}
 private:
     Ui::gameplaySettings *ui;
     int m_players;
     QVector<PlayerColor>m_playerColors;
     QVector<QString> m_namePlayers;
     QVector<QString> m_playerModes;
+    QButtonGroup *buttonGroupP2;
+    QButtonGroup *buttonGroupP3;
+    QButtonGroup *buttonGroupP4;
 };
 
 #endif // GAMEPLAYSETTINGS_H

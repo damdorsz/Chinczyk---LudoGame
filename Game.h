@@ -23,7 +23,7 @@ public:
     static constexpr bool SIX_FOR_HOME = true;
 
     /* players: no of players playing the game */
-    Game(unsigned int players,QVector<PlayerColor> tablicaKolorowGraczy);
+    Game(unsigned int players,QVector<PlayerColor> tablicaKolorowGraczy,QVector<QString> tablicaModeGamers);
 
     /* Creates a new instance and copies data from save state */
     Game(SaveGameEngine *save);
@@ -108,21 +108,21 @@ public:
 
     bool wouldCollideWithSameColor(Pawn* pawn, int diceFace);
 
+    bool isCurrentPlayerAI();
+
+    //GameAI* getAI() { return mAI; }
+
 private:
 
     bool isPositionOnBoard(const QPoint& position);
     unsigned int players_count {}; //Number of players playing the game
     Board* mBoard {}; //Game board
     QVector<PlayerColor> *currentSequence {}; //Player Turns sequence
+    QVector<QString> mPlayerModes {};
     unsigned int current {}; //Current player's index in the sequence
     unsigned int lastDiceValue {}; //Stores the value of dice rolled last time
     QRandomGenerator random {}; //For randomization of dice
-// signals:
-//     void noMovesAvailable(PlayerColor player);
-//     void turnEnded(PlayerColor nextPlayer);
-//     void moveMade(Pawn* pawn, int diceFace);
-    // void moveCompleted(Pawn* pawn, bool returnTurn);
-    // void pawnCaptured(Pawn* captured);
+    //GameAI* mAI ;
 };
 
 #endif //Game.h

@@ -24,8 +24,8 @@ const QColor GameWindow::COLOR_YELLOW_LIGHT = QColor (255,250,153);
 const QColor GameWindow::COLOR_BLUE_LIGHT = QColor (99,218,220);
 const QColor GameWindow::COLOR_GREEN_LIGHT = QColor (148,237,148);
 
-GameWindow::GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy, QVector<PlayerColor> tablicaGraczyKolor = {PlayerColor::RED, PlayerColor::YELLOW, PlayerColor::BLUE, PlayerColor::GREEN}) :
-    mGame {new Game(players_count,tablicaGraczyKolor)},
+GameWindow::GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy, QVector<PlayerColor> tablicaGraczyKolor, QVector<QString> tablicaModeGamers) :
+    mGame {new Game(players_count,tablicaGraczyKolor,tablicaModeGamers)},
     mBoard {mGame->getGameBoard()},
     state {ROLLING},
     mScreen (new GameScreen(this, tablicaGraczyKolor)),
@@ -38,19 +38,6 @@ GameWindow::GameWindow(unsigned int players_count, QVector<QString> tablicaNazwG
 
     init();
 }
-
-// GameWindow::GameWindow(unsigned int players_count) :
-// mGame {new Game(players_count)},
-// mBoard {mGame->getGameBoard()},
-// state {ROLLING},
-// mScreen (new GameScreen(this)),
-// footer {new QWidget(this)},
-// footerLayout {new QVBoxLayout()},
-// dice {new Dice(nullptr, 6)},
-// hintLabel {new QLabel()} {
-
-//     init();
-// }
 
 GameWindow::GameWindow(SaveGameEngine *save) :
     state {ROLLING},
@@ -164,6 +151,42 @@ void GameWindow::updateUi() {
             break;
     }
 
+        // if (state == ROLLING) {
+        //     if(mGame->isCurrentPlayerAI()) {
+        //         hintLabel->setText(QString("CPU wykonuje ruch..."));
+        //         dice->setEnabled(false);
+        //         // Dodajemy małe opóźnienie przed rzutem
+        //         QTimer::singleShot(500, this, [this]() {
+        //             animateDiceRoll();
+        //         });
+        //     } else {
+        //         hintLabel->setText(
+        //             QString("%1: Roll the dice!")
+        //                 .arg(getUserName(mGame->getCurrentPlayer()))
+        //             );
+        //         dice->setEnabled(true);
+        //     }
+        //     for (auto p : mBoard->getAllPawns())
+        //         p->setEnabled(false);
+        // } else if (state == MOVING) {
+        //     if(mGame->isCurrentPlayerAI()) {
+        //         // Pobierz wartość kostki i wykonaj ruch AI
+        //         int diceValue = dice->getValue();
+        //         // Dodajemy małe opóźnienie przed wykonaniem ruchu
+        //         QTimer::singleShot(500, this, [this, diceValue]() {
+        //             //mGameAI->makeMove(diceValue);
+        //             // Po wykonaniu ruchu AI, zaktualizuj stan gry
+        //             state = ROLLING;
+        //             updateUi();
+        //         });
+        //     } else {
+        //         hintLabel->setText(
+        //             QString("%1: Choose a pawn to move!")
+        //                 .arg(getUserName(mGame->getCurrentPlayer()))
+        //             );
+        //     }
+        //     dice->setEnabled(false);
+        // }
     if (state == ROLLING) {
         hintLabel->setText(
             QString("%1: Roll the dice!")
@@ -172,6 +195,15 @@ void GameWindow::updateUi() {
         for (auto p : mBoard->getAllPawns())
             p->setEnabled(false);
         dice->setEnabled(true);
+        if(mGame->isCurrentPlayerAI())
+        {
+            hintLabel->setText(QString("CPU is making a move..."));
+            QTimer::singleShot(1000, this, [this]() {
+                animateDiceRoll();
+            });/*
+            int diceValue = dice->getValue();
+            mGameAI->makeMove(diceValue);*/
+        }
 
     } else if (state == MOVING) {
         hintLabel->setText(
@@ -235,35 +267,42 @@ void GameWindow::animateDiceRoll() {
 
 void GameWindow::diceAnimationFinished() {
     qDebug() << "GameWindow::diceAnimationFinished()";
-
     dice->setValue(mGame->rollDice());
-
-    QVector<Pawn*> playables = mGame->getPlayablePawns(mGame->getLastDiceValue());
+    int diceValue = mGame->getLastDiceValue();
+    QVector<Pawn*> playables = mGame->getPlayablePawns(diceValue);
 
     if(playables.size() == 0) {
-        mGame->changeCurrentPlayer(); //We got no pawns worth moving
-        //But we need to wait for a second!
-
+        mGame->changeCurrentPlayer();
         QTimer *timer = new QTimer(this);
         connect(timer, &QTimer::timeout, this, [timer, this](){
             this->updateUi();
-            delete timer; //No need to stop it, just delete it
+            delete timer;
         });
-
         timer->start(700);
         this->state = ROLLING;
-        return; //It makes it look like we're still animating, but it's just a small pause between dice rollings
-
-    } else if(playables.size() == 1) { //Only a singal move available, rather not ask for it
-        pawnChosen(playables[0]); //Auto choosen
-
-    } else {
-        for (auto p : playables)
-            p->setEnabled(true);
-
-        state = MOVING;
+        return;
     }
 
+    if(mGame->isCurrentPlayerAI()) {
+        // Jeśli to AI, wykonaj ruch po krótkim opóźnieniu
+        QTimer *timer = new QTimer(this);
+        connect(timer, &QTimer::timeout, this, [timer, this, diceValue](){
+            mGameAI->makeMove(diceValue);
+            this->state = ROLLING;
+            this->updateUi();
+            delete timer;
+        });
+        timer->start(500);
+    } else {
+        // Logika dla gracza ludzkiego
+        if(playables.size() == 1) {
+            pawnChosen(playables[0]);
+        } else {
+            for (auto p : playables)
+                p->setEnabled(true);
+            state = MOVING;
+        }
+    }
     updateUi();
 }
 
@@ -357,12 +396,6 @@ void GameWindow::pawnClashed(Pawn *p) { // komenatrz 260125_1310
     }
     p->setGeometry(painthelp::getPawnHomePosGeometry(p->getColor(), ((p->getId()+1) % 4) + 1,which));
 }
-
-// void GameWindow::pawnClashed(Pawn *p) {
-//     p->changePosition(Pawn::HOME);
-//     //This line is used in the the Constructor of Pawn and has details in the comment there
-//     p->setGeometry(painthelp::getPawnHomePosGeometry(p->getColor(), ((p->getId()+1) % 4) + 1));
-// }
 
 void GameWindow::saveRequested() {
     saveGame();

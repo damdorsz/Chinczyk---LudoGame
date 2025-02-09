@@ -7,7 +7,6 @@
 #include <QRect>
 #include <QPoint>
 #include "PlayerColor.h"
-#include <QVector>
 
 class Pawn;
 /* This namespace provides helper function for drawing board and Pawns.

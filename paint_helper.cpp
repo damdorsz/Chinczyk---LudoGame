@@ -162,30 +162,6 @@ namespace painthelp {
         return getPawnGeometry(v[finalIndex]);
     }
 
-    // QRect getPawnHomePosGeometry(PlayerColor color, int which,int numerGracza) {
-    //     if(which < 1 || which > 4)
-    //         ValueError::raise_new(QString("Invalid value for which : %1").arg(which));
-
-    //     QVector<QRect> v = getHomeCircleRects();
-    //     switch (color) {
-    //         case PlayerColor::RED:
-    //             return getPawnGeometry(v[which-1]);
-    //         case PlayerColor::YELLOW:
-    //             return getPawnGeometry(v[which+3]);
-    //         case PlayerColor::BLUE:
-    //             return getPawnGeometry(v[which+7]);
-    //         case PlayerColor::GREEN:
-    //             return getPawnGeometry(v[which+11]);
-
-    //         //This should never happen.
-    //         default:
-    //             ValueError::raise_new(QString("paint_helper.cpp:getPawnHomePos : \
-    //             Critical Error (no enum value fell for a switch)"));
-    //     }
-    //     #pragma GCC diagnostic ignored "-Wreturn-type"
-    // }
-    // #pragma GCC diagnostic warning "-Wreturn-type"
-
     QRect getPawnDestGeometry(PlayerColor color, QVector<PlayerColor> colorPlayer) {
         QPoint cell;
         if(color == colorPlayer[0])

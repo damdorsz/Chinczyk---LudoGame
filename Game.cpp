@@ -8,57 +8,15 @@
 #include <SaveGameEngine.h>
 #include <ValueError.h>
 
-Game::Game(unsigned int players, QVector<PlayerColor> tablicaKolorowGraczy) :
+Game::Game(unsigned int players, QVector<PlayerColor> tablicaKolorowGraczy,QVector<QString> tablicaModeGamers) :
     players_count(players), mBoard(new Board {players,tablicaKolorowGraczy}),
     currentSequence(new QVector<PlayerColor> {}), current (0),
     random (QRandomGenerator::securelySeeded()) {
-
-    switch(players) {
-    case 2:
-        currentSequence->push_back(tablicaKolorowGraczy[0]);
-        currentSequence->push_back(tablicaKolorowGraczy[1]); //So that pawns are at opposite corners
-        break;
-    case 3:
-        currentSequence->push_back(tablicaKolorowGraczy[0]);
-        currentSequence->push_back(tablicaKolorowGraczy[1]);
-        currentSequence->push_back(tablicaKolorowGraczy[2]);
-        break;
-    case 4:
-        currentSequence->push_back(tablicaKolorowGraczy[0]);
-        currentSequence->push_back(tablicaKolorowGraczy[1]);
-        currentSequence->push_back(tablicaKolorowGraczy[2]);
-        currentSequence->push_back(tablicaKolorowGraczy[3]);
-        break;
+    for (size_t i = 0; i < players; ++i) {
+        currentSequence->push_back(tablicaKolorowGraczy[i]);
+        mPlayerModes.push_back(tablicaModeGamers[i]);
     }
-
-    // for (size_t i = 0; i < players; ++i) {
-    //     currentSequence->push_back(tablicaKolorowGraczy[i]);
-    // }
 }
-
-// Game::Game(unsigned int players) : // alfa 1.0
-//     players_count(players), mBoard(new Board {players}),
-//     currentSequence(new QVector<PlayerColor> {}), current (0),
-//     random (QRandomGenerator::securelySeeded()) {
-
-//     switch(players) {
-//         case 2:
-//             currentSequence->push_back(PlayerColor::RED);
-//             currentSequence->push_back(PlayerColor::BLUE); //So that pawns are at opposite corners
-//             break;
-//         case 3:
-//             currentSequence->push_back(PlayerColor::RED);
-//             currentSequence->push_back(PlayerColor::YELLOW);
-//             currentSequence->push_back(PlayerColor::BLUE);
-//             break;
-//         case 4:
-//             currentSequence->push_back(PlayerColor::RED);
-//             currentSequence->push_back(PlayerColor::YELLOW);
-//             currentSequence->push_back(PlayerColor::BLUE);
-//             currentSequence->push_back(PlayerColor::GREEN);
-//             break;
-//     }
-// }
 
 Game::Game(SaveGameEngine *save) {
     this->players_count = save->readInt();
@@ -73,6 +31,15 @@ Game::Game(SaveGameEngine *save) {
     this->mBoard = save->getBoard();
     
     this->random = QRandomGenerator::securelySeeded();
+}
+
+bool Game::isCurrentPlayerAI() {
+    bool wynik = false;
+    QString cpu = "CPU";
+
+    if(mPlayerModes[current] == cpu)
+        wynik = true;
+    return wynik;
 }
 
 void Game::serializeInto(SaveGameEngine *save) {
@@ -126,28 +93,9 @@ unsigned int Game::predictRel(Pawn* pawn, unsigned int diceFace) {
 
     return newPosition;
 }
-
-// unsigned int Game::predictRel(Pawn* pawn, unsigned int diceFace) { // alfa 1.0
-//     qInfo() << "Game::predictRel(Pawn*, int)";
-
-//     if(pawn->isAtHome() && diceFace != 6 && SIX_FOR_HOME)
-//         ValueError::raise_new(QString("Invalid move"));
-//     if(pawn->getRelPosition() + diceFace > Pawn::DEST)
-//         ValueError::raise_new(QString("Invalid move"));
-
-//     if(pawn->isAtHome()) //Just get out of home by one step
-//         return pawn->getRelPosition() + 1;
-//     else
-//         return pawn->getRelPosition() + diceFace;
-// }
-
 void Game::changeCurrentPlayer() {
-    if(current >= (unsigned int)(currentSequence->size())-1) {
-        current = 0;
-        return;
-    }
-
-    current++;
+    current = (current + 1) % currentSequence->size(); // Przechodzi do następnego gracza
+    qDebug() << "Teraz tura gracza:" << (int)getCurrentPlayer();
 }
 
 QVector<PlayerColor> Game::getCurrentPlayerSequence() {
@@ -175,62 +123,78 @@ bool Game::isFinished() {
     return i >= players_count - 1;
 }
 
-bool Game::playMove(Pawn* pawn, int diceFace) {
-    qInfo() << "Game::playMove(Pawn*, int)";
 
-    if(pawn->getRelPosition() + diceFace > Pawn::DEST) {
-        qDebug() << "Prevented move that would exceed board limit";
-        return false;
-    }
+    bool Game::playMove(Pawn* pawn, int diceFace) {
+        qInfo() << "Game::playMove(Pawn*, int)";
 
-    // Sprawdź czy ruch jest w ogóle możliwy
-    QVector<Pawn*> playablePawns = getPlayablePawns(diceFace);
-    if (playablePawns.isEmpty()) {
-        handleNoMoves();
-        return false;
-    }
+        if (pawn->getRelPosition() + diceFace > Pawn::DEST) {
+            qDebug() << "Prevented move that would exceed board limit";
+            return false;
+        }
 
-    // Sprawdź czy wybrany pionek jest wśród możliwych do ruchu
-    if (!playablePawns.contains(pawn)) {
-        qDebug() << "Wybrany pionek nie może wykonać ruchu";
-        return false;
-    }
+        // Sprawdź, czy ruch jest w ogóle możliwy
+        QVector<Pawn*> playablePawns = getPlayablePawns(diceFace);
+        if (playablePawns.isEmpty()) {
+            handleNoMoves();
+            return false;
+        }
 
-    unsigned int futureRel = Game::predictRel(pawn, diceFace);
-    bool re_turn = diceFace == 6;
-    Pawn* toClash = nullptr;
+        // Sprawdź, czy wybrany pionek jest wśród możliwych do ruchu
+        if (!playablePawns.contains(pawn)) {
+            qDebug() << "Wybrany pionek nie może wykonać ruchu";
+            return false;
+        }
 
-    if(futureRel != Pawn::DEST) {
-        QVector<Pawn*> pawnsThere = mBoard->getPawnsAt(
-            mBoard->getPawnCoordinates(
-                pawn->getColor(),
-                futureRel
-                )
-            );
-        if(pawnsThere.size() == 1 && pawnsThere[0]->getColor() != pawn->getColor()) {
-            toClash = pawnsThere[0];
+        unsigned int futureRel = Game::predictRel(pawn, diceFace);
+        bool re_turn = diceFace == 6;
+        Pawn* toClash = nullptr;
+
+        if (futureRel != Pawn::DEST) {
+            QVector<Pawn*> pawnsThere = mBoard->getPawnsAt(
+                mBoard->getPawnCoordinates(
+                    pawn->getColor(),
+                    futureRel
+                    )
+                );
+            if (pawnsThere.size() == 1 && pawnsThere[0]->getColor() != pawn->getColor()) {
+                toClash = pawnsThere[0];
+                re_turn = true;
+            }
+        } else {
             re_turn = true;
         }
-    } else {
-        re_turn = true;
+
+        // Wykonaj ruch
+        if (isCurrentPlayerAI()) {
+            // Jeśli to ruch AI, dodaj małe opóźnienie dla lepszej wizualizacji
+            //QTimer::singleShot(300, [this, pawn, futureRel]() {
+                pawn->changePosition(futureRel);
+            //});
+        } else {
+            pawn->changePosition(futureRel);
+        }
+
+        // Sprawdź warunki zwycięstwa
+        if (checkVictoryConditions(pawn->getColor())) {
+            announceVictory(pawn->getColor());
+        }
+
+        // Obsługa zbicia pionka
+        if (toClash != nullptr) {
+            if (isCurrentPlayerAI()) {
+                //QTimer::singleShot(500, [toClash]() {
+                    toClash->goBackHome();
+                //});
+            } else {
+                toClash->goBackHome();
+            }
+        }
+
+        return re_turn;
     }
 
-    // Wykonaj ruch
-    pawn->changePosition(futureRel);
-
-    // Sprawdź warunki zwycięstwa
-    if (checkVictoryConditions(pawn->getColor()))
-            announceVictory(pawn->getColor());
 
 
-    if(toClash != nullptr)
-        toClash->goBackHome();
-
-    // Emituj sygnał o wykonanym ruchu (przydatne dla AI)
-    //emit moveMade(pawn, diceFace);
-
-    return re_turn;
-}
 
 // Dodajmy nową metodę sprawdzającą kolizje
 bool Game::wouldCollideWithSameColor(Pawn* pawn, int diceFace) {
@@ -250,6 +214,7 @@ bool Game::wouldCollideWithSameColor(Pawn* pawn, int diceFace) {
 
 // Zmodyfikowana metoda getPlayablePawns
 QVector<Pawn*> Game::getPlayablePawns(int diceFace) {
+    qDebug() << "getPlayablePawns(int diceFace)";
     if(diceFace < 1 || diceFace > 6)
         ValueError::raise_new(QString("Invalid dice value : %1").arg(diceFace));
 
@@ -392,70 +357,3 @@ bool Game::isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColo
     }
     return false;
 }
-
-// QVector<Pawn*> Game::getPlayablePawns(int diceFace) { wersja alfa 1.0
-//     if(diceFace < 1 || diceFace > 6)
-//         ValueError::raise_new(QString("Invalid dice value : %1").arg(diceFace));
-
-//     QVector<Pawn*> result;
-//     QVector<Pawn*> pawns = mBoard->getAllPawns();
-
-//     for(auto p : pawns) {
-//         if(p->getColor() != getCurrentPlayer())
-//             continue;
-//         if(p->isAtHome() && diceFace != 6 && SIX_FOR_HOME)
-//             continue;
-//         if(p->hasReachedDestination())
-//             continue;
-//         if(p->getRelPosition() + diceFace > Pawn::DEST)
-//             continue;
-
-//         result.append(p);
-//     }
-
-//     return result;
-// }
-
-// bool Game::playMove(Pawn* pawn, int diceFace) {
-//     qInfo() << "Game::playMove(Pawn*, int)";
-
-//     //Set it to the number by which we're gonna move
-//     unsigned int futureRel {Game::predictRel(pawn, diceFace)};
-
-//     //Will the player get a turn again?
-//     bool re_turn = diceFace == 6;
-
-//     //Pawn which was hit by this one while moving
-//     Pawn* toClash {nullptr};
-
-//     //This pawn couldn't have been clashed with anybody, because it has reached destination
-//     if(futureRel != Pawn::DEST) {
-
-//         //If there is only one pawn at this new location, send it back home
-//         //This should be done before moving the current pawn
-//         QVector<Pawn*> pawnsThere = mBoard->getPawnsAt(
-//             mBoard->getPawnCoordinates(
-//                 pawn->getColor(),
-//                 futureRel //Our future position
-//                 )
-//             );
-
-//         if(pawnsThere.size() == 1 && pawnsThere[0]->getColor() != pawn->getColor()) {
-//             toClash = pawnsThere[0];
-//             re_turn = true;
-//         }
-
-//     } else {
-//         //But we do get a turn again,..
-//         re_turn = true;
-//     }
-
-//     //We can now move the pawn
-//     pawn->changePosition(futureRel);
-
-//     //And send the clashed one home
-//     if(toClash != nullptr)
-//         toClash->goBackHome();
-
-//     return re_turn;
-// }
