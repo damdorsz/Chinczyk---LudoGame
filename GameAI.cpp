@@ -1,9 +1,10 @@
-#include "gameai.h"
+#include "GameAI.h"
 #include <Board.h>
 #include <Pawn.h>
 #include <PlayerColor.h>
-#include <QTimer>
 #include "Game.h"
+
+#include <QTimer>
 
 GameAI::GameAI(Game* game)
     :
@@ -75,3 +76,4 @@ Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
     qDebug() << "AI wybiera pierwszy dostępny pionek:" << (int )pawns.first()->getColor();
     return pawns.first();
 }
+

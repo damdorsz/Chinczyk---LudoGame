@@ -8,20 +8,21 @@
 #include <QSet>
 #include <QMessageBox>
 #include <QLineEdit>
-#include "PlayerColor.h"
+#include "PaintHelper.h"
 #include <QButtonGroup>
 
 namespace Ui {
-class gameplaySettings;
+class GameplaySettings;
 }
 
-class gameplaySettings : public QDialog
+class GameplaySettings : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit gameplaySettings(QWidget *parent = nullptr);
-    ~gameplaySettings();
+    explicit GameplaySettings(QWidget *parent = nullptr);
+    ~GameplaySettings();
+
     void ustawienieKolorowDomyslne();
     void updateAvailableColors();
     void updateControlsForP3(int state);
@@ -32,8 +33,10 @@ public:
     QVector<PlayerColor> getPlayerColors() const{return m_playerColors;}
     QVector<QString> getNamePlayers() const{return m_namePlayers;}
     QVector<QString> getPlayerModes() const{return  m_playerModes;}
+
 private:
-    Ui::gameplaySettings *ui;
+    Ui::GameplaySettings *ui;
+
     int m_players;
     QVector<PlayerColor>m_playerColors;
     QVector<QString> m_namePlayers;

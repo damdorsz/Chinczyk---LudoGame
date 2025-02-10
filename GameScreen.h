@@ -7,7 +7,7 @@
 #include <QVector>
 
 #include <PlayerColor.h>
-#include <paint_helper.h>
+#include <PaintHelper.h>
 
 class GameWindow;
 

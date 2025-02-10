@@ -24,7 +24,7 @@
 
 #include <GameScreen.h>
 #include "PlayerColor.h"
-#include "gameai.h"
+#include "GameAI.h"
 
 class Game;
 class Board;

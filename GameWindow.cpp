@@ -7,7 +7,7 @@
 #include <Pawn.h>
 #include <PlayerColor.h>
 #include <Dice.h>
-#include <paint_helper.h>
+#include <PaintHelper.h>
 #include <ValueError.h>
 #include <About.h>
 

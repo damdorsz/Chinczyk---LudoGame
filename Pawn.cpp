@@ -6,7 +6,7 @@
 #include <PlayerColor.h>
 #include <GameWindow.h>
 #include <ValueError.h>
-#include <paint_helper.h>
+#include <PaintHelper.h>
 
 const qreal Pawn::GLOW_SCALE = 0.25;
 

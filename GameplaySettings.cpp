@@ -1,10 +1,9 @@
-#include "gameplaySettings.h"
-#include "ui_gameplaSettings.h"
+#include "GameplaySettings.h"
+#include "ui_GameplaySettings.h"
 
-
-gameplaySettings::gameplaySettings(QWidget *parent)
+GameplaySettings::GameplaySettings(QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::gameplaySettings)
+    , ui(new Ui::GameplaySettings)
 {
     ui->setupUi(this);
 
@@ -17,12 +16,12 @@ gameplaySettings::gameplaySettings(QWidget *parent)
     buttonGroupP3->addButton(ui->radioButtonP3_2);
     buttonGroupP4->addButton(ui->radioButtonP4);
     buttonGroupP4->addButton(ui->radioButtonP4_2);
-     ui->radioButtonP2_2->setChecked(true);
-     ui->radioButtonP3_2->setChecked(true);
-     ui->radioButtonP4_2->setChecked(true);
-    connect(ui->checkBoxP3, &QCheckBox::stateChanged, this, &gameplaySettings::updateControlsForP3);
-    connect(ui->checkBoxP4, &QCheckBox::stateChanged, this, &gameplaySettings::updateControlsForP4);
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &gameplaySettings::validateSettings);
+    ui->radioButtonP2_2->setChecked(true);
+    ui->radioButtonP3_2->setChecked(true);
+    ui->radioButtonP4_2->setChecked(true);
+    connect(ui->checkBoxP3, &QCheckBox::stateChanged, this, &GameplaySettings::updateControlsForP3);
+    connect(ui->checkBoxP4, &QCheckBox::stateChanged, this, &GameplaySettings::updateControlsForP4);
+    connect(ui->buttonBox_2, &QDialogButtonBox::accepted, this, &GameplaySettings::validateSettings);
     updateControlsForP3(ui->checkBoxP3->isChecked() ? Qt::Checked : Qt::Unchecked);
     updateControlsForP4(ui->checkBoxP4->isChecked() ? Qt::Checked : Qt::Unchecked);
 
@@ -31,18 +30,18 @@ gameplaySettings::gameplaySettings(QWidget *parent)
         QComboBox *comboBox = findChild<QComboBox*>(comboName);
 
         if (comboBox) {
-            connect(comboBox, &QComboBox::currentIndexChanged, this, &gameplaySettings::updateAvailableColors);
+            connect(comboBox, &QComboBox::currentIndexChanged, this, &GameplaySettings::updateAvailableColors);
         }
     }
     ustawienieKolorowDomyslne();
 }
 
-gameplaySettings::~gameplaySettings()
+GameplaySettings::~GameplaySettings()
 {
     delete ui;
 }
 
-void gameplaySettings::ustawienieKolorowDomyslne()
+void GameplaySettings::ustawienieKolorowDomyslne()
 {
     QVector<QString> colors = {"Red", "Blue", "Green", "Yellow"};
     for (int licznik = 1; licznik <= 4; licznik++) {
@@ -61,7 +60,7 @@ void gameplaySettings::ustawienieKolorowDomyslne()
     }
 }
 
-void gameplaySettings::updateAvailableColors()
+void GameplaySettings::updateAvailableColors()
 {
     QSet<QString> usedColors;
 
@@ -102,7 +101,7 @@ void gameplaySettings::updateAvailableColors()
     }
 }
 
-void gameplaySettings::updateControlsForP3(int state)
+void GameplaySettings::updateControlsForP3(int state)
 {
     bool isEnabled = (state == Qt::Checked);
     if (ui->radioButtonP3) {
@@ -119,7 +118,7 @@ void gameplaySettings::updateControlsForP3(int state)
     }
 }
 
-void gameplaySettings::updateControlsForP4(int state)
+void GameplaySettings::updateControlsForP4(int state)
 {
     bool isEnabled = (state == Qt::Checked);
     if (ui->radioButtonP4) {
@@ -136,7 +135,7 @@ void gameplaySettings::updateControlsForP4(int state)
     }
 }
 
-void gameplaySettings::validateSettings() {
+void GameplaySettings::validateSettings() {
 
     QVector<QString> namePlayers;
     QVector<PlayerColor> playerColors = {PlayerColor::WHITE,PlayerColor::WHITE,PlayerColor::WHITE,PlayerColor::WHITE};

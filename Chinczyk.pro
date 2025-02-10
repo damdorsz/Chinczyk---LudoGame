@@ -13,34 +13,34 @@ SOURCES += \
     Board.cpp \
     Dice.cpp \
     Game.cpp \
+    GameAI.cpp \
     GameScreen.cpp \
     GameWindow.cpp \
+    GameplaySettings.cpp \
+    PaintHelper.cpp \
     Path.cpp \
     Pawn.cpp \
     ValueError.cpp \
-    gameai.cpp \
-    gameplaySettings.cpp \
-    main.cpp \
-    paint_helper.cpp
+    main.cpp
 
 HEADERS += \
     About.h \
     Board.h \
     Dice.h \
     Game.h \
+    GameAI.h \
     GameScreen.h \
     GameWindow.h \
+    GameplaySettings.h \
+    PaintHelper.h \
     Path.h \
     Pawn.h \
     PlayerColor.h \
-    ValueError.h \
-    gameai.h \
-    gameplaySettings.h \
-    paint_helper.h
+    ValueError.h
 
 FORMS += \
+    GameplaySettings.ui \
     about.ui \
-    gameplaSettings.ui \
     welcome.ui
 
 # Default rules for deployment.

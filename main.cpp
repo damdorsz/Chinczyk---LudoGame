@@ -16,11 +16,11 @@
 #include <ValueError.h>
 #include <About.h>
 
-#include <paint_helper.h>
+#include <PaintHelper.h>
 
 #include "ui_welcome.h"
 
-#include "gameplaySettings.h"
+#include "GameplaySettings.h"
 
 void aboutClicked() {
     AboutDialog::show();
@@ -28,7 +28,7 @@ void aboutClicked() {
 
 void startClick(Ui::WelcomeWindow &ui, QMainWindow &welcomeWindow) {
     GameWindow *gameWin;
-    gameplaySettings *m_gameplaySettings = new gameplaySettings();
+    GameplaySettings *m_gameplaySettings = new GameplaySettings();
     if (m_gameplaySettings->exec() == QDialog::Accepted) {
         unsigned int players = m_gameplaySettings->getPlayers();
         QVector<PlayerColor> tablicaKolorowGraczy = m_gameplaySettings->getPlayerColors();

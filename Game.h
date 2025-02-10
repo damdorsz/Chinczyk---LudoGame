@@ -5,13 +5,12 @@
 #include <QVector>
 #include <QPoint>
 #include <PlayerColor.h>
-#include "paint_helper.h"
+#include "PaintHelper.h"
 #include <QMessageBox>
 
 
 class Pawn;
 class Board;
-class SaveGameEngine;
 enum class PlayerColor;
 
 class Game {
