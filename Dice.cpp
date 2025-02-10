@@ -13,7 +13,7 @@ QWidget(parent), current_value(init_val) {}
 
 Dice::~Dice() {}
 
-unsigned int Dice::getValue() {
+unsigned int Dice::getValue() const {
     return current_value;
 }
 
@@ -26,11 +26,11 @@ void Dice::setValue(unsigned int v) {
     this->repaint();
 }
 
-QColor Dice::getColor() {
+QColor Dice::getColor() const {
     return backColor;
 }
 
-void Dice::setColor(QColor c) {
+void Dice::setColor(const QColor &c) {
     this->backColor = c;
     this->repaint();
 }
@@ -41,7 +41,7 @@ void Dice::setVisualSize(qreal size) {
     this->size = size;
 }
 
-qreal Dice::getVisualSize() {
+qreal Dice::getVisualSize() const {
     return size;
 }
 
@@ -50,7 +50,7 @@ void Dice::rotate(int degres) {
     repaint();
 }
 
-int Dice::getRotation() {
+int Dice::getRotation() const {
     return this->rotation;
 }
 
@@ -58,7 +58,7 @@ void Dice::setEnabled(bool e) {
     this->enabled = e;
 }
 
-bool Dice::isEnabled() {
+bool Dice::isEnabled() const {
     return this->enabled;
 }
 

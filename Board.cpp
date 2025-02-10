@@ -22,7 +22,7 @@ void Board::initializePlayerPawns(PlayerColor color, unsigned int startPosition,
     mTablicaGraczyKolor[playerNumber - 1] = color;
 }
 
-void Board::validatePlayerCount(unsigned int players) {
+void Board::validatePlayerCount(unsigned int players) const {
     if (players < MIN_PLAYERS || players > MAX_PLAYERS) {
         ValueError::raise_new(QString("Invalid number of players. Expected value between %1 to %2 but got %3")
                                   .arg(MIN_PLAYERS)
@@ -31,15 +31,11 @@ void Board::validatePlayerCount(unsigned int players) {
     }
 }
 
-Board::Board(unsigned int players, QVector<PlayerColor> tablicaGraczyKolor)
+Board::Board(unsigned int players, QVector<PlayerColor>& tablicaGraczyKolor)
     : players_count(players) {
     validatePlayerCount(players);
-    if (players >= 4) {
-        initializePlayerPawns(tablicaGraczyKolor[3], 0, 4);
-    }
-    if (players >= 3) {
-        initializePlayerPawns(tablicaGraczyKolor[2], 4, 3);
-    }
+    if (players >= 4) initializePlayerPawns(tablicaGraczyKolor[3], 0, 4);
+    if (players >= 3) initializePlayerPawns(tablicaGraczyKolor[2], 4, 3);
     if (players >= 2) {
         initializePlayerPawns(tablicaGraczyKolor[1], 8, 2);
         initializePlayerPawns(tablicaGraczyKolor[0], 12, 1);
@@ -51,11 +47,11 @@ Board::~Board() {
         delete p;
 }
 
-unsigned int Board::getPlayersCount() {
+unsigned int Board::getPlayersCount() const {
     return players_count;
 }
 
-QPoint Board::getPawnCoordinates(PlayerColor color,unsigned int relpos){
+QPoint Board::getPawnCoordinates(PlayerColor color,unsigned int relpos) {
     qInfo() << "Board::getPawnCoordinates(PlayerColor, int) : relpos == " << relpos;
 
     if (color == mTablicaGraczyKolor[0]) {
@@ -92,11 +88,11 @@ QPoint Board::getPawnCoordinates(Pawn* p) {
     return getPawnCoordinates(p->getColor(), p->getRelPosition());
 }
 
-QVector<Pawn*> Board::getAllPawns() {
+QVector<Pawn*> Board::getAllPawns() const {
     return mPawns;
 }
 
-QVector<Pawn*> Board::getPawnsAt(QPoint point) {
+QVector<Pawn*> Board::getPawnsAt(const QPoint& point) const {
     qInfo() << "Board::getPawnsAt(QPoint)";
 
     QVector<Pawn*> result {};
@@ -110,11 +106,11 @@ QVector<Pawn*> Board::getPawnsAt(QPoint point) {
     return result;
 }
 
-Pawn* Board::getPawnById(unsigned int id) {
+Pawn* Board::getPawnById(unsigned int id) const {
     return mPawns[id];
 }
 
-QVector<Pawn*> Board::getAllPawnsByColor(PlayerColor color) {
+QVector<Pawn*> Board::getAllPawnsByColor(PlayerColor color) const {
     if(color == PlayerColor::YELLOW && players_count == 2)
         ValueError::raise_new(QString("Board::getAllPawnsByColor : Current game does not have YELLOW color"));
     if(color == PlayerColor::GREEN && players_count != 4)

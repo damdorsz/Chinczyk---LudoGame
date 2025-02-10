@@ -12,24 +12,24 @@ class Pawn;
 
 class Board {
 public:
-
-    Board(unsigned int players, QVector<PlayerColor> tablicaGraczyKolor);
+    explicit Board(unsigned int players, QVector<PlayerColor>& tablicaGraczyKolor);
     virtual ~Board();
 
-    unsigned int getPlayersCount();
-    static QPoint getPawnCoordinates(PlayerColor color, unsigned int relpos);
-    static QPoint getPawnCoordinates(Pawn* p);
-    QVector<Pawn*> getAllPawns();
-    QVector<Pawn*> getPawnsAt(QPoint point);
-    Pawn* getPawnById(unsigned int id);
-    QVector<Pawn*> getAllPawnsByColor(PlayerColor color);
+    unsigned int getPlayersCount() const;
+    static QPoint getPawnCoordinates(PlayerColor color, unsigned int relpos)  ;
+    static QPoint getPawnCoordinates(Pawn *p) ;
+    QVector<Pawn*> getAllPawns() const;
+    QVector<Pawn*> getPawnsAt(const QPoint& point) const;
+    Pawn* getPawnById(unsigned int id) const;
+    QVector<Pawn*> getAllPawnsByColor(PlayerColor color) const;
     static QVector<QPoint> getEndZone(PlayerColor color);
     static QVector<QPoint> endZone;
-    Pawn* getPawnAtPosition(const QPoint& position);
+    Pawn* getPawnAtPosition(const QPoint& position) const;
     static QVector<PlayerColor> getTabGraczyKolor();
-    static QPoint getPawnEndZone(PlayerColor color,unsigned int relpos);
+    static QPoint getPawnEndZone(PlayerColor color, unsigned int relpos);
     void initializePlayerPawns(PlayerColor color, unsigned int startPosition, unsigned int playerNumber);
-    void validatePlayerCount(unsigned int players);
+    void validatePlayerCount(unsigned int players) const;
+
 private:
     static const unsigned int MIN_PLAYERS = 2;
     static const unsigned int MAX_PLAYERS = 4;
@@ -37,7 +37,6 @@ private:
     unsigned int players_count {};
     QVector<Pawn*> mPawns {};
     static QVector<PlayerColor> mTablicaGraczyKolor;
-
 };
 
-#endif //Board.h
+#endif // BOARD_H

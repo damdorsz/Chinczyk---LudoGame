@@ -24,16 +24,16 @@ public:
     static const QColor COLOR_DICE_SECONDARY;
     explicit Dice(QWidget *parent = nullptr, unsigned int init_val = 3);
     ~Dice();
-    unsigned int getValue();
+    unsigned int getValue() const;
     void setValue(unsigned int v);
-    QColor getColor();
-    void setColor(QColor c);
+    QColor getColor() const;
+    void setColor(const QColor& c);
     void setVisualSize(qreal size);
-    qreal getVisualSize();
+    qreal getVisualSize() const;
     void rotate(int degrees);
-    int getRotation();
-     void setEnabled(bool e);
-     bool isEnabled();
+    int getRotation() const;
+    void setEnabled(bool e);
+    bool isEnabled() const;
 
 signals:
     void clicked();
@@ -44,7 +44,7 @@ private:
     qreal size {};
     bool enabled {true};
     qreal rotation {0};
-    void paintEvent(QPaintEvent *e);
-    void mousePressEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *e) override;
+    void mousePressEvent(QMouseEvent *event) override;
 };
 #endif //DICE_H

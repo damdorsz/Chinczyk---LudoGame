@@ -7,16 +7,17 @@
 class ValueError : public QException {
 public:
     ValueError();
+    explicit ValueError(const QString& why);
 
     void raise() const override;
-    ValueError *clone() const override;
+    ValueError* clone() const override;
 
-    ValueError(QString why);
-    static void raise_new(QString why);
+    static void raise_new(const QString& why);
 
-    QString why();
+    QString why() const;
+
 private:
-    QString reason {};
+    QString reason;
 };
 
-#endif //VALUE_ERROR_H
+#endif // VALUE_ERROR_H
