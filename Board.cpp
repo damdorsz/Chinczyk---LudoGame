@@ -8,18 +8,18 @@
 #include <Path.h>
 #include <ValueError.h>
 
-QVector<PlayerColor> Board::mTablicaGraczyKolor = {PlayerColor::WHITE, PlayerColor::WHITE, PlayerColor::WHITE, PlayerColor::WHITE};
+QVector<PlayerColor> Board::mPlayersColours = {PlayerColor::WHITE, PlayerColor::WHITE, PlayerColor::WHITE, PlayerColor::WHITE};
 
-QVector<PlayerColor> Board::getTabGraczyKolor()
+QVector<PlayerColor> Board::getPlayersColours()
 {
-    return mTablicaGraczyKolor;
+    return mPlayersColours;
 }
 
 void Board::initializePlayerPawns(PlayerColor color, unsigned int startPosition, unsigned int playerNumber) {
     for (unsigned int i = 0; i < PAWNS_PER_PLAYER; ++i) {
         mPawns.append(new Pawn(color, startPosition + i, playerNumber));
     }
-    mTablicaGraczyKolor[playerNumber - 1] = color;
+    mPlayersColours[playerNumber - 1] = color;
 }
 
 void Board::validatePlayerCount(unsigned int players) const {
@@ -31,14 +31,14 @@ void Board::validatePlayerCount(unsigned int players) const {
     }
 }
 
-Board::Board(unsigned int players, QVector<PlayerColor>& tablicaGraczyKolor)
+Board::Board(unsigned int players, QVector<PlayerColor>& PlayersColours)
     : players_count(players) {
     validatePlayerCount(players);
-    if (players >= 4) initializePlayerPawns(tablicaGraczyKolor[3], 0, 4);
-    if (players >= 3) initializePlayerPawns(tablicaGraczyKolor[2], 4, 3);
+    if (players >= 4) initializePlayerPawns(PlayersColours[3], 0, 4);
+    if (players >= 3) initializePlayerPawns(PlayersColours[2], 4, 3);
     if (players >= 2) {
-        initializePlayerPawns(tablicaGraczyKolor[1], 8, 2);
-        initializePlayerPawns(tablicaGraczyKolor[0], 12, 1);
+        initializePlayerPawns(PlayersColours[1], 8, 2);
+        initializePlayerPawns(PlayersColours[0], 12, 1);
     }
 }
 
@@ -54,13 +54,13 @@ unsigned int Board::getPlayersCount() const {
 QPoint Board::getPawnCoordinates(PlayerColor color,unsigned int relpos) {
     qInfo() << "Board::getPawnCoordinates(PlayerColor, int) : relpos == " << relpos;
 
-    if (color == mTablicaGraczyKolor[0]) {
+    if (color == mPlayersColours[0]) {
         return Path::getAbsoluteCordinates(relpos);
-    } else if (color == mTablicaGraczyKolor[2]) {
+    } else if (color == mPlayersColours[2]) {
         return Path::rotatePointToRight(Path::getAbsoluteCordinates(relpos));
-    } else if (color == mTablicaGraczyKolor[1]) {
+    } else if (color == mPlayersColours[1]) {
         return Path::rotatePointToRight(Path::getAbsoluteCordinates(relpos), 2);
-    } else if (color == mTablicaGraczyKolor[3]) {
+    } else if (color == mPlayersColours[3]) {
         return Path::rotatePointToRight(Path::getAbsoluteCordinates(relpos), 3);
     } else {
         ValueError::raise_new(QString("Board::getPawnCoordinates(PlayerColor, int) : Invalid PlayerColor"));
@@ -70,13 +70,13 @@ QPoint Board::getPawnCoordinates(PlayerColor color,unsigned int relpos) {
 QPoint Board::getPawnEndZone(PlayerColor color,unsigned int relpos) {
     relpos -= 40;
     qInfo() << "Board::getPawnEndZone(PlayerColor, int) : relpos == " << relpos;
-    if (color == mTablicaGraczyKolor[0]) {
+    if (color == mPlayersColours[0]) {
         return Path::getEndZoneCordinates(relpos);
-    } else if (color == mTablicaGraczyKolor[2]) {
+    } else if (color == mPlayersColours[2]) {
         return Path::rotatePointToRight(Path::getEndZoneCordinates(relpos));
-    } else if (color == mTablicaGraczyKolor[1]) {
+    } else if (color == mPlayersColours[1]) {
         return Path::rotatePointToRight(Path::getEndZoneCordinates(relpos), 2);
-    } else if (color == mTablicaGraczyKolor[3]) {
+    } else if (color == mPlayersColours[3]) {
         return Path::rotatePointToRight(Path::getEndZoneCordinates(relpos), 3);
     } else {
         ValueError::raise_new(QString("Board::getPawnEndZone(PlayerColor, int) : Invalid PlayerColor"));

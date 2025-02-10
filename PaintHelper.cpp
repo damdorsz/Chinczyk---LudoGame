@@ -168,7 +168,7 @@ QRect getPawnDestGeometry(PlayerColor color, QVector<PlayerColor> colorPlayer) {
 }
 
 QRect getPawnDestGeometry(Pawn *p) {
-    return getPawnDestGeometry(p->getColor(),Board::getTabGraczyKolor());
+    return getPawnDestGeometry(p->getColor(),Board::getPlayersColours());
 }
 
 QRect getPawnGeometry(QRect cellRect) {
