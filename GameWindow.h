@@ -21,6 +21,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QFileDialog>
+#include <QKeyEvent>
 
 #include <GameScreen.h>
 #include "PlayerColor.h"
@@ -103,5 +104,6 @@ private:
     GameAI* mGameAI;
 protected:
     void closeEvent(QCloseEvent*);
+    void keyPressEvent(QKeyEvent *event) override;
 };
 #endif //GameWindow.h

@@ -49,28 +49,24 @@ void GameWindow::init() {
     QAction *exitAction = gameMenu->addAction(QIcon::fromTheme("file-save"), "&Exit");
     connect(aboutAction, &QAction::triggered, this, &GameWindow::aboutRequested);
     connect(exitAction, &QAction::triggered, this, &GameWindow::exitRequested);
-
-    // Double the dice size and triple the width
     dice->setVisualSize(DICE_SIZE *2);
     dice->setFixedWidth(dice->width() * 2);
 
 
     footer->setFixedSize(
-        CELL_SIZE * 5 * 4,  // Szerokość
-        dice->height()  + (CELL_SIZE / 20)  // Mniejsza wysokość
+        CELL_SIZE * 5 * 4,
+        dice->height()  + (CELL_SIZE / 20)
         );
 
     footer->move(
-        (CELL_SIZE * 9),  // Poziome położenie
-        BOARD_BOUND + (this->height() / 30)  // Znacznie bliżej górnej krawędzi planszy
+        (CELL_SIZE * 9),
+        BOARD_BOUND + (this->height() / 30)
         );
 
-    // Ustawienia etykiety
     hintLabel->setFixedWidth(footer->geometry().width());
     hintLabel->setWordWrap(true);
     hintLabel->setAlignment(Qt::AlignCenter);
 
-    // Duża, pogrubiona czcionka
     QFont labelFont = hintLabel->font();
     labelFont.setPointSize(labelFont.pointSize() * 3);
     labelFont.setBold(true);
@@ -78,15 +74,12 @@ void GameWindow::init() {
 
     dice->setColor(COLOR_RED_LIGHT);
 
-    // Układ stopki - kostka na górze, etykieta pod nią
     footerLayout->addWidget(dice, 0, Qt::AlignCenter);
     footerLayout->addWidget(hintLabel, 0, Qt::AlignCenter);
     footerLayout->setContentsMargins(0, 0, 0, 0);
     footerLayout->setSpacing(1);
     footer->setLayout(footerLayout);
 
-
-    // Dostosowanie rozmiaru ekranu
     this->mScreen->setFixedSize(
         (BOARD_BOUND * 2) + (CELL_SIZE * 16) + footer->width() /2,
         (BOARD_BOUND * 2) + (CELL_SIZE * 11)
@@ -191,6 +184,15 @@ void GameWindow::rollDiceClicked() {
 
     hintLabel->setText(QString(""));
     animateDiceRoll();
+}
+
+void GameWindow::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Space) {
+        if (state == GameState::ROLLING) {
+            animateDiceRoll();
+        }
+    }
+    QMainWindow::keyPressEvent(event);
 }
 
 void GameWindow::animateDiceRoll() {
