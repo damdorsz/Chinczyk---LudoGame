@@ -8,30 +8,21 @@ gameplaySettings::gameplaySettings(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Tworzenie grup przycisków
     buttonGroupP2 = new QButtonGroup(this);
     buttonGroupP3 = new QButtonGroup(this);
     buttonGroupP4 = new QButtonGroup(this);
-
-    // Dodawanie przycisków do odpowiednich grup
     buttonGroupP2->addButton(ui->radioButtonP2);
     buttonGroupP2->addButton(ui->radioButtonP2_2);
-
     buttonGroupP3->addButton(ui->radioButtonP3);
     buttonGroupP3->addButton(ui->radioButtonP3_2);
-
     buttonGroupP4->addButton(ui->radioButtonP4);
     buttonGroupP4->addButton(ui->radioButtonP4_2);
-
      ui->radioButtonP2_2->setChecked(true);
      ui->radioButtonP3_2->setChecked(true);
      ui->radioButtonP4_2->setChecked(true);
-
     connect(ui->checkBoxP3, &QCheckBox::stateChanged, this, &gameplaySettings::updateControlsForP3);
     connect(ui->checkBoxP4, &QCheckBox::stateChanged, this, &gameplaySettings::updateControlsForP4);
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &gameplaySettings::validateSettings);
-
-
     updateControlsForP3(ui->checkBoxP3->isChecked() ? Qt::Checked : Qt::Unchecked);
     updateControlsForP4(ui->checkBoxP4->isChecked() ? Qt::Checked : Qt::Unchecked);
 
@@ -54,8 +45,6 @@ gameplaySettings::~gameplaySettings()
 void gameplaySettings::ustawienieKolorowDomyslne()
 {
     QVector<QString> colors = {"Red", "Blue", "Green", "Yellow"};
-
-    // Iteracja przez ComboBoxy (comboBoxP1, comboBoxP2, ...)
     for (int licznik = 1; licznik <= 4; licznik++) {
         QString nazwaComboBoxa = QString("comboBoxP%1").arg(licznik);
         QComboBox *comboBox = findChild<QComboBox*>(nazwaComboBoxa);
@@ -96,8 +85,6 @@ void gameplaySettings::updateAvailableColors()
 
         if (comboBox) {
             QString currentSelection = comboBox->currentText();
-
-            // Blokowanie sygnałów na czas aktualizacji
             bool signalsBlocked = comboBox->blockSignals(true);
 
             comboBox->clear();
@@ -110,8 +97,6 @@ void gameplaySettings::updateAvailableColors()
             }
 
             comboBox->setCurrentText(currentSelection);
-
-            // Przywrócenie sygnałów
             comboBox->blockSignals(signalsBlocked);
         }
     }
@@ -175,7 +160,7 @@ void gameplaySettings::validateSettings() {
             if (selectedColor == "-") {
                 QMessageBox::warning(this, "Invalid Selection",
                                      QString("Please select a color"));
-                return; // Wstrzymaj walidację
+                return;
             }
             if(selectedColor == "Red")
                 playerColors[i - 1] = PlayerColor::RED;
@@ -216,7 +201,7 @@ void gameplaySettings::validateSettings() {
             if (namePlayer == "") {
                 QMessageBox::warning(this, "Invalid Selection",
                                      QString("Please write a name player"));
-                return; // Wstrzymaj walidację
+                return;
             }
             else {
                 namePlayers.append(namePlayer);
@@ -236,6 +221,6 @@ void gameplaySettings::validateSettings() {
     m_playerColors = playerColors;
     m_namePlayers = namePlayers;
     m_playerModes = playerModes;
-    accept(); // Akceptuj ustawienia tylko po pełnej walidacji
+    accept();
 }
 

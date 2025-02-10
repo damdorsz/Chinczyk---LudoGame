@@ -5,7 +5,6 @@
 #include <Board.h>
 #include <Pawn.h>
 #include <PlayerColor.h>
-#include <SaveGameEngine.h>
 #include <ValueError.h>
 
 Game::Game(unsigned int players, QVector<PlayerColor> tablicaKolorowGraczy,QVector<QString> tablicaModeGamers) :
@@ -18,20 +17,6 @@ Game::Game(unsigned int players, QVector<PlayerColor> tablicaKolorowGraczy,QVect
     }
 }
 
-Game::Game(SaveGameEngine *save) {
-    this->players_count = save->readInt();
-    
-    this->currentSequence = new QVector<PlayerColor> {};
-    for(unsigned int i = 0; i < players_count; i++)
-        this->currentSequence->append(static_cast<PlayerColor>(save->readInt()));
-    
-    this->current = save->readInt();
-    this->lastDiceValue = save->readInt();
-    
-    this->mBoard = save->getBoard();
-    
-    this->random = QRandomGenerator::securelySeeded();
-}
 
 bool Game::isCurrentPlayerAI() {
     bool wynik = false;
@@ -42,24 +27,12 @@ bool Game::isCurrentPlayerAI() {
     return wynik;
 }
 
-void Game::serializeInto(SaveGameEngine *save) {
-    save->writeInt(this->players_count);
-    
-    for(auto p : *(this->currentSequence))
-        save->writeInt(static_cast<int>(p));
-    
-    save->writeInt(this->current);
-    save->writeInt(this->lastDiceValue);
-}
-
 Game::~Game() {
     delete currentSequence;
     delete mBoard;
 }
 
 int Game::rollDice() {
-    //TODO:: Generate a random number between 1 to 6
-
     lastDiceValue = random.bounded(1, 7);
     return lastDiceValue;
 }
@@ -75,7 +48,6 @@ Board* Game::getGameBoard() {
 unsigned int Game::predictRel(Pawn* pawn, unsigned int diceFace) {
     qInfo() << "Game::predictRel(Pawn*, int)";
 
-    // Najpierw sprawdź wszystkie warunki
     if(pawn->isAtHome() && diceFace != 6 && SIX_FOR_HOME) {
         ValueError::raise_new(QString("Invalid move: need 6 to leave home"));
     }
@@ -174,10 +146,6 @@ bool Game::playMove(Pawn* pawn, int diceFace) {
     return re_turn;
 }
 
-
-
-
-// Dodajmy nową metodę sprawdzającą kolizje
 bool Game::wouldCollideWithSameColor(Pawn* pawn, int diceFace) {
     QPoint futurePos = mBoard->getPawnCoordinates(
         pawn->getColor(),
@@ -193,7 +161,6 @@ bool Game::wouldCollideWithSameColor(Pawn* pawn, int diceFace) {
     return false;
 }
 
-// Zmodyfikowana metoda getPlayablePawns
 QVector<Pawn*> Game::getPlayablePawns(int diceFace) {
     qDebug() << "getPlayablePawns(int diceFace)";
     if(diceFace < 1 || diceFace > 6)
@@ -216,29 +183,22 @@ QVector<Pawn*> Game::getPlayablePawns(int diceFace) {
         if(p->hasReachedDestination())
             continue;
 
-        // Sprawdź kolizje z pionkami tego samego koloru
         if(wouldCollideWithSameColor(p, diceFace))
             continue;
 
-        // Jeśli wszystkie warunki spełnione, dodaj do możliwych ruchów
         result.append(p);
     }
 
-    // Jeśli nie ma możliwych ruchów, automatycznie kończymy turę
     if (result.isEmpty()) {
-        qDebug() << "Brak możliwych ruchów dla gracza" ;//<< getCurrentPlayer();
-        //emit noMovesAvailable(getCurrentPlayer());
+        qDebug() << "Brak możliwych ruchów dla gracza" ;
     }
 
     return result;
 }
 
-// Dodajmy metodę obsługującą automatyczne kończenie tury
 void Game::handleNoMoves() {
-    qDebug() << "Automatyczne zakończenie tury gracza" ;//<< getCurrentPlayer();
-    // Tu możemy dodać logikę zmiany gracza
+    qDebug() << "Automatyczne zakończenie tury gracza" ;
     changeCurrentPlayer();
-    // emit turnEnded(getCurrentPlayer());
 }
 
 void Game::announceVictory(PlayerColor color) {
@@ -268,9 +228,6 @@ void Game::announceVictory(PlayerColor color) {
         );
 
     victoryBox.exec();
-
-    // Możesz też emitować sygnał o zwycięstwie
-    //emit gameWon(color);
 }
 
 bool Game::checkVictoryConditions(PlayerColor color) {
@@ -284,14 +241,14 @@ bool Game::checkVictoryConditions(PlayerColor color) {
 
         QPoint pawnPos = mBoard->getPawnEndZone(color, pawn->getRelPosition());
         int distance = abs(pawnPos.x() - 5) + abs(pawnPos.y() - 5);
-        // Sprawdź czy pionek jest w strefie końcowej (odległość 0-3 od środka)
+
         if (distance <= 4) {
             pawnsInEndZone++;
             qDebug() << "Pionkow w strefie: " << pawnsInEndZone;
         }
     }
 
-    return pawnsInEndZone == 4;  // Zwycięstwo gdy wszystkie 4 pionki są w strefie
+    return pawnsInEndZone == 4;
 }
 
 bool Game::isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColor playerColor) {
@@ -314,12 +271,9 @@ bool Game::isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColo
     for (const auto& danger : dangerousPositions) {
         if (position == danger.pos) {
             if (danger.maxAllowedMove >= 4) {
-                // Użyj getPawnsAt zamiast getPawnAtPosition
                 QVector<Pawn*> pawnsAtPosition = mBoard->getPawnsAt(position);
                 if (!pawnsAtPosition.empty()) {
-                    // Sprawdź każdy pionek na tej pozycji
                     for (Pawn* pawn : pawnsAtPosition) {
-                        // Jeśli znajdziemy pionek innego koloru, nie blokujemy ruchu
                         if (pawn->getColor() != playerColor) {
                             qDebug() << "Pole" << position << "ignorowane, ponieważ pionek ma inny kolor niż gracz.";
                             return false;

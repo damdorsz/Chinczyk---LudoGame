@@ -5,8 +5,6 @@
 #include "ui_about.h"
 
 namespace AboutDialog {
-
-    //Simply creates and shows an about dialog
     void show();
 }
 

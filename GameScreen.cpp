@@ -18,7 +18,6 @@ void GameScreen::paintEvent(QPaintEvent*) {
 
     painter.setPen(QPen(QBrush(GameWindow::STROKE_COLOR), GameWindow::STROKE_WIDTH));
 
-    //Printing the grids (Like some little kid's math notebook, lmao!)
     for (int i = 0; i < 11; i++) {
         for (int j = 0; j < 11; j++) {
             QRect g (GameWindow::BOARD_BOUND + (i * GameWindow::CELL_SIZE), GameWindow::BOARD_BOUND + (j * GameWindow::CELL_SIZE), GameWindow::CELL_SIZE, GameWindow::CELL_SIZE);
@@ -46,7 +45,6 @@ QColor GameScreen::whichColour(PlayerColor szukanyKolor)
         return QColor (0,0,0);
 }
 
-//Draws homes for all players
 void GameScreen::drawHomes(QPainter &painter) {
     QBrush tlBrush (whichColour(tabGraczyKolor[0]));
     painter.setBrush(tlBrush);
@@ -64,17 +62,14 @@ void GameScreen::drawHomes(QPainter &painter) {
     painter.setBrush(blBrush);
     painter.drawRect(painthelp::getBottomLeftHomeRect());
 
-    //Draw four white circles on each home which holds the pawns
     painter.setBrush(QBrush(GameWindow::BG_COLOR));
     for (auto e : painthelp::getHomeCircleRects())
         painter.drawEllipse(e);
 }
 
-
-//Colors some proper cells to guide the pawns
 void GameScreen::drawGuidePaths(QPainter &painter) {
     QPoint topLeft {0, 4}; //
-    painter.setBrush(whichColour(tabGraczyKolor[0])); //dodaj kolory
+    painter.setBrush(whichColour(tabGraczyKolor[0]));
     painter.drawEllipse(painthelp::getCellRect(topLeft).center(), GameWindow::GUIDER_DOT_SIZE, GameWindow::GUIDER_DOT_SIZE);
     topLeft = painthelp::pointBelow(topLeft);
     topLeft = painthelp::pointRight(topLeft);

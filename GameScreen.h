@@ -11,18 +11,15 @@
 
 class GameWindow;
 
-/* This class serves as GameWindow's central widget */
 class GameScreen : public QWidget {
 Q_OBJECT;
 
 public:
-    //Constructs a new object taking a GameWindow as parent
     explicit GameScreen(GameWindow *parent,QVector<PlayerColor> tablicaGraczyKolor);
 
     virtual ~GameScreen();
 
 private:
-    //Just helper functions
     void drawHomes(QPainter &painter);
     void drawGuidePaths(QPainter &painter);
     QColor whichColour(PlayerColor szukanyKolor);

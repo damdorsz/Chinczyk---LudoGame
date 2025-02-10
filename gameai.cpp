@@ -20,7 +20,6 @@ Pawn* GameAI::makeMove(int diceValue) {
         return nullptr;
     }
 
-    // Wybór najlepszego pionka do ruchu
     Pawn* selectedPawn = selectBestMove(playablePawns, diceValue);
     if (selectedPawn == nullptr) {
         qDebug() << "AI nie znalazło pionka do ruchu. Tura kończy się.";
@@ -32,7 +31,7 @@ Pawn* GameAI::makeMove(int diceValue) {
 }
 
 Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
-    // 1. Jeśli możemy wyjść z domku (wyrzucono 6), zrób to
+
     for (Pawn* pawn : pawns) {
         if (pawn->isAtHome() && diceValue == 6) {
             qDebug() << "AI wychodzi z domku pionkiem:" << (int )pawn->getColor();
@@ -40,7 +39,6 @@ Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
         }
     }
 
-    // 2. Jeśli możemy zbić pionek przeciwnika, zrób to
     for (Pawn* pawn : pawns) {
         if (!pawn->isAtHome()) {
             unsigned int futurePos = mGame->predictRel(pawn, diceValue);
@@ -56,7 +54,6 @@ Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
         }
     }
 
-    // 3. Priorytetyzuj pionki najbliżej mety
     Pawn* bestPawn = nullptr;
     int highestPosition = -1;
 
@@ -75,7 +72,6 @@ Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
         return bestPawn;
     }
 
-    // 4. Jeśli żadna z powyższych strategii nie zadziałała, wybierz pierwszy dostępny pionek
     qDebug() << "AI wybiera pierwszy dostępny pionek:" << (int )pawns.first()->getColor();
     return pawns.first();
 }

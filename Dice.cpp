@@ -36,9 +36,6 @@ void Dice::setColor(QColor c) {
 }
 
 void Dice::setVisualSize(qreal size) {
-    /* Leaving some extra space so we can rotate the dice properly
-     * This is important because a sqaure needs extra space to fit in when
-     * it is rotated */
     qreal abs_size = 2 * (qSqrt((size*size)/2));
     this->setFixedSize(abs_size, abs_size);
     this->size = size;
@@ -76,21 +73,14 @@ void Dice::paintEvent(QPaintEvent*) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    //Apply the rotation first
-    //Properly translate it so that our "extra gap" does'nt messes up with drawing
-    //see: comments at Dice::setDiceSize
     painter.translate(this->width() / 2, this->height() / 2);
     painter.rotate(rotation);
 
-    /* translate to the right corner, keeping the half of the "extra space" as
-     * margin space at all sides */
     painter.translate(this->width() / -2 + (this->width() - this->getVisualSize()) / 2,
         this->height() / -2 + (this->height() - this->getVisualSize())/2);
 
     QPainterPath outline {};
 
-    /* Extra space (half of border width) left for outline,
-     * this causes improvements in graphics rendering */
     outline.addRoundedRect(
         QRectF(
             QPointF(
@@ -109,7 +99,6 @@ void Dice::paintEvent(QPaintEvent*) {
     painter.setBrush(backColor);
     painter.drawPath(outline);
 
-    //Draw numbers on dice
     painter.setBrush(COLOR_DICE_SECONDARY);
     qreal dot_rad = this->getVisualSize() / 12.0; //Radius of the dots
     QPointF center = QPointF {getVisualSize() / 2, getVisualSize() / 2};

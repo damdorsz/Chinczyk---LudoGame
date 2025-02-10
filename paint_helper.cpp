@@ -9,8 +9,6 @@
 #include <QDebug>
 
 namespace painthelp {
-
-    //Return the absolute rectangular area on screen of the cell by it's x and y cordinates
     QRect getCellRect(int x, int y) {
         return QRect(
             GameWindow::BOARD_BOUND + (x * GameWindow::CELL_SIZE),
@@ -18,12 +16,10 @@ namespace painthelp {
             GameWindow::CELL_SIZE, GameWindow::CELL_SIZE);
     }
 
-    //Eqvi. to getCellRect(int, int) but uses QPoint as param instead
     QRect getCellRect(QPoint cell) {
         return getCellRect(cell.x(), cell.y());
     }
 
-    //Returns the rectangular region covering the home of red player
     QRect getTopLeftHomeRect() {
         return QRect (
             GameWindow::BOARD_BOUND,
@@ -33,7 +29,6 @@ namespace painthelp {
             );
     }
 
-    //Returns the rectangular region covering the home of yellow player
     QRect getTopRightHomeRect() {
         QRect cell = getCellRect(7, 0);
         return QRect (
@@ -43,7 +38,6 @@ namespace painthelp {
             );
     }
 
-    //Returns the rectangular region covering the home of blue player
     QRect getBottomRightHomeRect() {
         QRect cell = getCellRect(7, 7);
         return QRect (
@@ -53,7 +47,6 @@ namespace painthelp {
             );
     }
 
-    //Returns the rectangular region covering the home of green player
     QRect getBottomLeftHomeRect() {
         QRect cell = getCellRect(0, 7);
         return QRect (
@@ -63,7 +56,6 @@ namespace painthelp {
             );
     }
 
-    //Returns the rectangular region as QRect covering the destination box
     QRect getDestRect() {
         QRect cell = getCellRect(5, 5);
         return QRect (
@@ -73,7 +65,6 @@ namespace painthelp {
         );
     }
 
-    //Shifts the rect's corner to center of itself
     QRect shiftToCenter(QRect it) {
         return QRect (
             it.x() + (GameWindow::CELL_SIZE / 2),
@@ -83,7 +74,6 @@ namespace painthelp {
         );
     }
 
-    //Returns the vector of rects where white circles inside homes are to be drawn
     QVector<QRect> getHomeCircleRects() {
         return QVector<QRect> {
             shiftToCenter(getCellRect(0, 0)),
@@ -109,49 +99,46 @@ namespace painthelp {
     }
 
     QRect getPawnHomePosGeometry(PlayerColor color, int which, int numerGracza) {
-        // Walidacja parametrów wejściowych
+
         if (which < 1 || which > 4) {
             qDebug() << "Invalid which value:" << which;
-            which = 1; // Bezpieczna wartość domyślna
+            which = 1;
         }
 
         if (numerGracza < 1 || numerGracza > 4) {
             qDebug() << "Invalid numerGracza value:" << numerGracza;
-            numerGracza = 1; // Bezpieczna wartość domyślna
+            numerGracza = 1;
         }
 
         QVector<QRect> v = getHomeCircleRects();
 
-        // Mapowanie pozycji dla każdego gracza
         int baseIndex = 0;
         switch (numerGracza) {
-        case 1: // Lewy górny róg
+        case 1:
             baseIndex = 0;
             break;
-        case 2: // Prawy dolny róg
+        case 2:
             baseIndex = 8;
             break;
-        case 3: // Prawy górny róg
+        case 3:
             baseIndex = 4;
             break;
-        case 4: // Lewy dolny róg
+        case 4:
             baseIndex = 12;
             break;
         default:
             qDebug() << "Unexpected numerGracza value:" << numerGracza;
-            return v[0]; // Bezpieczna wartość domyślna
+            return v[0];
         }
 
-        // Oblicz finalny indeks
         int finalIndex = baseIndex + (which - 1);
 
-        // Dodatkowe zabezpieczenie przed wyjściem poza zakres
+
         if (finalIndex >= v.size()) {
             qDebug() << "Index out of bounds:" << finalIndex;
-            return v[0]; // Bezpieczna wartość domyślna
+            return v[0];
         }
 
-        // Debug info
         qDebug() << "getPawnHomePosGeometry:"
                  << "color:" << static_cast<int>(color)
                  << "which:" << which
@@ -184,10 +171,6 @@ namespace painthelp {
         return getPawnDestGeometry(p->getColor(),Board::getTabGraczyKolor());
     }
 
-    /* Returns the geometry that a pawn is supposed to have according to the
-     * cell it is in right now. Currently, it has same effect as calling 'getCellRect'
-     * but MAY differ in future due to modifications. The size of the pawn is
-     * handled internally by Pawn class itself */
     QRect getPawnGeometry(QRect cellRect) {
         return {
             cellRect.x(),
@@ -208,27 +191,22 @@ namespace painthelp {
         return getPawnGeometry(p->getPositionOnBoard());
     }
 
-    //Returns the point adjecent to the given point, lieing below it
     QPoint pointBelow(QPoint p) {
         return QPoint {p.x(), p.y()+1};
     }
 
-    //Returns the point adjecent to the given point, lieing right to it
     QPoint pointRight(QPoint p) {
         return QPoint {p.x()+1, p.y()};
     }
 
-    //Returns the point adjecent to the given point, lieing above it
     QPoint pointAbove(QPoint p) {
         return QPoint {p.x(), p.y()-1};
     }
 
-    //Returns the point adjecent to the given point, lieing left to it
     QPoint pointLeft(QPoint p) {
         return QPoint {p.x()-1, p.y()};
     }
 
-    //Returns the QRect on the cell where guider dots are to be drawn
     QRect getGuiderRegion(QRect cell) {
 
         QPoint center = cell.center();

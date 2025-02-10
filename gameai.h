@@ -3,15 +3,15 @@
 
 #include "Game.h"
 #include "Pawn.h"
-#include <QThread>  // Zamień QThread na QTimer, bo używamy QTimer::singleShot
-#include <QDebug>  // Do logowania
+#include <QThread>
+#include <QDebug>
 
 
 
-class GameAI   // Dziedziczymy po QObject, żeby móc używać QTimer
+class GameAI
 {
 public:
-    GameAI(Game* game);  // Dodajemy explicit i parent
+    GameAI(Game* game);
     Pawn* makeMove(int diceValue);
 
 private:

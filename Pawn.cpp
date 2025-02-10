@@ -5,7 +5,6 @@
 #include <Board.h>
 #include <PlayerColor.h>
 #include <GameWindow.h>
-#include <SaveGameEngine.h>
 #include <ValueError.h>
 #include <paint_helper.h>
 
@@ -16,27 +15,6 @@ Pawn::Pawn(PlayerColor color, int id,int position) :
 
     this->setGeometry(painthelp::getPawnHomePosGeometry(color, this->getIndex(),position));
 
-}
-
-// test
-
-Pawn::Pawn(SaveGameEngine *save) {
-    this->mColor = static_cast<PlayerColor>(save->readInt());
-    this->mId = save->readInt();
-    this->mPos = save->readInt();
-    this->mGlow = save->readReal();
-
-    if(this->isAtHome())
-        this->setGeometry(painthelp::getPawnHomePosGeometry(mColor, this->getIndex(),1));
-    else
-        this->setGeometry(painthelp::getPawnGeometry(this));
-}
-
-void Pawn::serializeInto(SaveGameEngine *save) {
-    save->writeInt(static_cast<int>(this->mColor));
-    save->writeInt(this->mId);
-    save->writeInt(this->mPos);
-    save->writeReal(this->mGlow);
 }
 
 Pawn::~Pawn() {}
@@ -61,7 +39,6 @@ unsigned int Pawn::getId() {
 }
 
 unsigned int Pawn::getIndex() {
-    //index is extracted using id of the pawn, as the ids are sure to be in sequence
     return ((this->getId()+1) % 4) + 1;
 }
 
@@ -123,7 +100,7 @@ void Pawn::setEnabled(bool state) {
         glowEffect = nullptr;
     }
 
-    if(state) { //Play animation
+    if(state) {
         glowEffect = new QPropertyAnimation(this, "glow", this);
         glowEffect->setStartValue(0);
         glowEffect->setKeyValueAt(0.5, 1);

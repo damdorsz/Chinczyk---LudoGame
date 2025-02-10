@@ -17,7 +17,6 @@ SOURCES += \
     GameWindow.cpp \
     Path.cpp \
     Pawn.cpp \
-    SaveGameEngine.cpp \
     ValueError.cpp \
     gameai.cpp \
     gameplaySettings.cpp \
@@ -34,7 +33,6 @@ HEADERS += \
     Path.h \
     Pawn.h \
     PlayerColor.h \
-    SaveGameEngine.h \
     ValueError.h \
     gameai.h \
     gameplaySettings.h \
