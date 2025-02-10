@@ -7,22 +7,25 @@
 #include <PlayerColor.h>
 #include <ValueError.h>
 
-Game::Game(unsigned int players, QVector<PlayerColor> tablicaKolorowGraczy,QVector<QString> tablicaModeGamers) :
-    players_count(players), mBoard(new Board {players,tablicaKolorowGraczy}),
-    currentSequence(new QVector<PlayerColor> {}), current (0),
-    random (QRandomGenerator::securelySeeded()) {
+Game::Game(unsigned int players,const  QVector<PlayerColor>& playerColors, const QVector<QString>& playerModes)
+    : playersCount(players)
+    , mBoard(new Board{players, playerColors})
+    , currentSequence(new QVector<PlayerColor>{})
+    , currentPlayerIndex(0)
+    , random(QRandomGenerator::securelySeeded())
+{
     for (size_t i = 0; i < players; ++i) {
-        currentSequence->push_back(tablicaKolorowGraczy[i]);
-        mPlayerModes.push_back(tablicaModeGamers[i]);
+        currentSequence->push_back(playerColors[i]);
+        this->playerModes.push_back(playerModes[i]);
     }
 }
 
 
-bool Game::isCurrentPlayerAI() {
+bool Game::isCurrentPlayerAI() const {
     bool wynik = false;
     QString cpu = "CPU";
 
-    if(mPlayerModes[current] == cpu)
+    if(playerModes[currentPlayerIndex] == cpu)
         wynik = true;
     return wynik;
 }
@@ -37,15 +40,15 @@ int Game::rollDice() {
     return lastDiceValue;
 }
 
-PlayerColor Game::getCurrentPlayer() {
-    return (*currentSequence)[current];
+PlayerColor Game::getCurrentPlayer() const {
+    return (*currentSequence)[currentPlayerIndex];
 }
 
-Board* Game::getGameBoard() {
+Board* Game::getGameBoard() const {
     return mBoard;
 }
 
-unsigned int Game::predictRel(Pawn* pawn, unsigned int diceFace) {
+unsigned int Game::predictRel(Pawn* pawn, unsigned int diceFace) const {
     qInfo() << "Game::predictRel(Pawn*, int)";
 
     if(pawn->isAtHome() && diceFace != 6 && SIX_FOR_HOME) {
@@ -66,19 +69,18 @@ unsigned int Game::predictRel(Pawn* pawn, unsigned int diceFace) {
     return newPosition;
 }
 void Game::changeCurrentPlayer() {
-    current = (current + 1) % currentSequence->size(); // Przechodzi do następnego gracza
-    qDebug() << "Teraz tura gracza:" << (int)getCurrentPlayer();
+    currentPlayerIndex = (currentPlayerIndex + 1) % currentSequence->size();
 }
 
-QVector<PlayerColor> Game::getCurrentPlayerSequence() {
+QVector<PlayerColor> Game::getCurrentPlayerSequence() const {
     return *currentSequence;
 }
 
-unsigned int Game::getLastDiceValue() {
+unsigned int Game::getLastDiceValue() const {
     return lastDiceValue;
 }
 
-bool Game::playerHasFinished(PlayerColor c) {
+bool Game::playerHasFinished(PlayerColor c) const {
     for(auto p : mBoard->getAllPawnsByColor(c))
         if(!p->hasReachedDestination())
             return false;
@@ -86,13 +88,13 @@ bool Game::playerHasFinished(PlayerColor c) {
     return false;
 }
 
-bool Game::isFinished() {
+bool Game::isFinished() const {
     unsigned int i = 0;
     for (auto c : *currentSequence)
         if(playerHasFinished(c))
             i++;
 
-    return i >= players_count - 1;
+    return i >= playersCount - 1;
 }
 
 
@@ -110,7 +112,7 @@ bool Game::playMove(Pawn* pawn, int diceFace) {
     }
 
     if (!playablePawns.contains(pawn)) {
-        qDebug() << "Wybrany pionek nie może wykonać ruchu";
+        qDebug() << "The selected pawn cannot make a move";
         return false;
     }
 
@@ -146,7 +148,7 @@ bool Game::playMove(Pawn* pawn, int diceFace) {
     return re_turn;
 }
 
-bool Game::wouldCollideWithSameColor(Pawn* pawn, int diceFace) {
+bool Game::wouldCollideWithSameColor(Pawn* pawn, int diceFace) const {
     QPoint futurePos = mBoard->getPawnCoordinates(
         pawn->getColor(),
         Game::predictRel(pawn, diceFace)
@@ -161,7 +163,7 @@ bool Game::wouldCollideWithSameColor(Pawn* pawn, int diceFace) {
     return false;
 }
 
-QVector<Pawn*> Game::getPlayablePawns(int diceFace) {
+QVector<Pawn*> Game::getPlayablePawns(int diceFace) const {
     qDebug() << "getPlayablePawns(int diceFace)";
     if(diceFace < 1 || diceFace > 6)
         ValueError::raise_new(QString("Invalid dice value : %1").arg(diceFace));
@@ -190,39 +192,38 @@ QVector<Pawn*> Game::getPlayablePawns(int diceFace) {
     }
 
     if (result.isEmpty()) {
-        qDebug() << "Brak możliwych ruchów dla gracza" ;
+        qDebug() << "No possible moves for the player" ;
     }
 
     return result;
 }
 
 void Game::handleNoMoves() {
-    qDebug() << "Automatyczne zakończenie tury gracza" ;
+    qDebug() << "Automatic termination of a player's turn" ;
     changeCurrentPlayer();
 }
 
 void Game::announceVictory(PlayerColor color) {
     QString colorName;
     switch(color) {
-    case PlayerColor::RED: colorName = "Czerwony"; break;
-    case PlayerColor::BLUE: colorName = "Niebieski"; break;
-    case PlayerColor::YELLOW: colorName = "Zolty"; break;
-    case PlayerColor::GREEN: colorName = "Zielony"; break;
+    case PlayerColor::RED: colorName = "Red"; break;
+    case PlayerColor::BLUE: colorName = "Blue"; break;
+    case PlayerColor::YELLOW: colorName = "Yellow"; break;
+    case PlayerColor::GREEN: colorName = "Green"; break;
     }
 
     QMessageBox victoryBox;
-    victoryBox.setWindowTitle("Gratulacje!");
-    victoryBox.setText(QString("Gracz %1 wygrał grę!").arg(colorName));
+    victoryBox.setWindowTitle("Congratulations!");
+    victoryBox.setText(QString("Player %1 won the game!").arg(colorName));
     victoryBox.setIcon(QMessageBox::Information);
 
-    // Dodaj własne style do okna dialogowego
     victoryBox.setStyleSheet(
         "QMessageBox {"
         "    background-color: #f0f0f0;"
         "}"
         "QMessageBox QLabel {"
         "    color: #2c3e50;"
-        "    font-size: 14px;"
+        "    font-size: 45px;"
         "    font-weight: bold;"
         "}"
         );
@@ -230,7 +231,7 @@ void Game::announceVictory(PlayerColor color) {
     victoryBox.exec();
 }
 
-bool Game::checkVictoryConditions(PlayerColor color) {
+bool Game::checkVictoryConditions(PlayerColor color) const {
     int pawnsInEndZone = 0;
     QVector<Pawn*> pawns = mBoard->getAllPawns();
 
@@ -244,14 +245,14 @@ bool Game::checkVictoryConditions(PlayerColor color) {
 
         if (distance <= 4) {
             pawnsInEndZone++;
-            qDebug() << "Pionkow w strefie: " << pawnsInEndZone;
+            qDebug() << "Pawns in end zone: " << pawnsInEndZone;
         }
     }
 
     return pawnsInEndZone == 4;
 }
 
-bool Game::isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColor playerColor) {
+bool Game::isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColor playerColor) const {
     const QPoint forbiddenPoint(5, 5);
 
     struct DangerousPosition {
@@ -275,7 +276,7 @@ bool Game::isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColo
                 if (!pawnsAtPosition.empty()) {
                     for (Pawn* pawn : pawnsAtPosition) {
                         if (pawn->getColor() != playerColor) {
-                            qDebug() << "Pole" << position << "ignorowane, ponieważ pionek ma inny kolor niż gracz.";
+                            qDebug() << "Position" << position << "ignored because the pawn is a different colour from the player's.";
                             return false;
                         }
                     }
@@ -283,8 +284,8 @@ bool Game::isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColo
             }
 
             if (diceValue > danger.maxAllowedMove) {
-                qDebug() << "Pozycja" << position << "jest niebezpieczna. Maksymalny dozwolony ruch:"
-                         << danger.maxAllowedMove << "Wyrzucono:" << diceValue;
+                qDebug() << "Position" << position << "is unsafe. Maximum permitted traffic:"
+                         << danger.maxAllowedMove << "Dumped:" << diceValue;
                 return true;
             }
             break;

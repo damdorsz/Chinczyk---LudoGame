@@ -4,63 +4,62 @@
 #include <QRandomGenerator>
 #include <QVector>
 #include <QPoint>
-#include <PlayerColor.h>
-#include "PaintHelper.h"
+#include <QString>
 #include <QMessageBox>
-
+#include "PaintHelper.h"
+#include "PlayerColor.h"
 
 class Pawn;
 class Board;
-enum class PlayerColor;
 
 class Game {
-
 public:
     static constexpr bool SIX_FOR_HOME = true;
-    Game(unsigned int players,QVector<PlayerColor> tablicaKolorowGraczy,QVector<QString> tablicaModeGamers);
+
+    Game(unsigned int players, const QVector<PlayerColor>& playerColors, const QVector<QString>& playerModes);
     virtual ~Game();
 
     int rollDice();
-    Board* getGameBoard();
-    QVector<Pawn*> getPlayablePawns(int diceFace);
-    unsigned int predictRel(Pawn* p,unsigned int diceFace);
+    Board* getGameBoard() const;
+    QVector<Pawn*> getPlayablePawns(int diceFace) const;
+    unsigned int predictRel(Pawn* p, unsigned int diceFace) const;
     bool playMove(Pawn* pawn, int diceFace);
-    PlayerColor getCurrentPlayer();
+    PlayerColor getCurrentPlayer() const;
     void changeCurrentPlayer();
-    QVector<PlayerColor> getCurrentPlayerSequence();
-    unsigned int getLastDiceValue();
-    bool playerHasFinished(PlayerColor p);
-    bool isFinished();
-    bool isMoveValid(Pawn* pawn, const QPoint& predictedPosition);
-    bool isMoveOnOwnPawn(Pawn *movingPawn, int predictedPosition);
-    QVector<Pawn*> getPawnsOfPlayer(PlayerColor color);
+    QVector<PlayerColor> getCurrentPlayerSequence() const;
+    unsigned int getLastDiceValue() const;
+    bool playerHasFinished(PlayerColor p) const;
+    bool isFinished() const;
+    bool isMoveValid(Pawn* pawn, const QPoint& predictedPosition) const;
+    bool isMoveOnOwnPawn(Pawn* movingPawn, int predictedPosition) const;
+    QVector<Pawn*> getPawnsOfPlayer(PlayerColor color) const;
     void movePawn(Pawn* pawn, unsigned int diceFace);
     void endGame(PlayerColor winner);
-    bool hasPlayerWon(PlayerColor color);
+    bool hasPlayerWon(PlayerColor color) const;
     void nextPlayer();
-    bool isValidEndZoneMove(Pawn* pawn, int diceFace);
-    QRect getHomePosition(Pawn* pawn);
-    int findPawnNumber(Pawn* pawn);
-    bool isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColor playerColor);
-    bool checkVictoryConditions(PlayerColor color);
+    bool isValidEndZoneMove(Pawn* pawn, int diceFace) const;
+    QRect getHomePosition(Pawn* pawn) const;
+    int findPawnNumber(Pawn* pawn) const;
+    bool isNearForbiddenZone(const QPoint& position, int diceValue, PlayerColor playerColor) const;
+    bool checkVictoryConditions(PlayerColor color) const;
     void announceVictory(PlayerColor color);
     void handleNoMoves();
-    bool wouldCollideWithSameColor(Pawn* pawn, int diceFace);
-    bool isCurrentPlayerAI();
+    bool wouldCollideWithSameColor(Pawn* pawn, int diceFace) const;
+    bool isCurrentPlayerAI() const;
 
 private:
+    bool isPositionOnBoard(const QPoint& position) const;
 
-    bool isPositionOnBoard(const QPoint& position);
-    unsigned int players_count {};
-    Board* mBoard {};
-    QVector<PlayerColor> *currentSequence {};
-    QVector<QString> mPlayerModes {};
-    unsigned int current {};
-    unsigned int lastDiceValue {};
-    QRandomGenerator random {};
+    unsigned int playersCount{};
+    Board* mBoard;
+    QVector<PlayerColor> *currentSequence{};
+    QVector<QString> playerModes{};
+    unsigned int currentPlayerIndex{};
+    unsigned int lastDiceValue{};
+    QRandomGenerator random{};
 };
 
-#endif //Game.h
+#endif // GAME_H
 
 
 

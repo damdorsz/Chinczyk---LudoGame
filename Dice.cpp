@@ -100,7 +100,7 @@ void Dice::paintEvent(QPaintEvent*) {
     painter.drawPath(outline);
 
     painter.setBrush(COLOR_DICE_SECONDARY);
-    qreal dot_rad = this->getVisualSize() / 12.0; //Radius of the dots
+    qreal dot_rad = this->getVisualSize() / 12.0;
     QPointF center = QPointF {getVisualSize() / 2, getVisualSize() / 2};
 
     QPointF left = QPointF {center.x() - (dot_rad * 3), center.y()};

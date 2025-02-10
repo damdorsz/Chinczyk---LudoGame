@@ -31,7 +31,7 @@ void Board::validatePlayerCount(unsigned int players) const {
     }
 }
 
-Board::Board(unsigned int players, QVector<PlayerColor>& PlayersColours)
+Board::Board(unsigned int players,const QVector<PlayerColor>& PlayersColours)
     : players_count(players) {
     validatePlayerCount(players);
     if (players >= 4) initializePlayerPawns(PlayersColours[3], 0, 4);

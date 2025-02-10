@@ -12,7 +12,7 @@ class Pawn;
 
 class Board {
 public:
-    explicit Board(unsigned int players, QVector<PlayerColor>& PlayersColours);
+    explicit Board(unsigned int players,const QVector<PlayerColor>& PlayersColours);
     virtual ~Board();
 
     unsigned int getPlayersCount() const;
