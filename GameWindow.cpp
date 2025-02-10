@@ -49,13 +49,13 @@ void GameWindow::init() {
     QAction *exitAction = gameMenu->addAction(QIcon::fromTheme("file-save"), "&Exit");
     connect(aboutAction, &QAction::triggered, this, &GameWindow::aboutRequested);
     connect(exitAction, &QAction::triggered, this, &GameWindow::exitRequested);
-    dice->setVisualSize(DICE_SIZE *2);
-    dice->setFixedWidth(dice->width() * 2);
+    dice->setVisualSize(DICE_SIZE);
+    dice->setFixedWidth(dice->width());
 
 
     footer->setFixedSize(
         CELL_SIZE * 5 * 4,
-        dice->height()  + (CELL_SIZE / 20)
+        dice->height()  + (CELL_SIZE )
         );
 
     footer->move(

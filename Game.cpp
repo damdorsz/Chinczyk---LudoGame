@@ -130,8 +130,6 @@ bool Game::playMove(Pawn* pawn, int diceFace) {
         if (pawnsThere.size() == 1 && pawnsThere[0]->getColor() != pawn->getColor()) {
             toClash = pawnsThere[0];
         }
-    } else {
-        re_turn = true;
     }
 
     pawn->changePosition(futureRel);

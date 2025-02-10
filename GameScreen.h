@@ -20,9 +20,9 @@ public:
     virtual ~GameScreen();
 
 private:
-    void drawHomes(QPainter &painter);
     void drawGuidePaths(QPainter &painter);
     QColor whichColour(PlayerColor searchColour);
+    void drawHomes(QPainter &painter);
     QVector<PlayerColor> coloursPlayers;
 
 protected:

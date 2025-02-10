@@ -55,7 +55,7 @@ public:
     static const int CELL_SIZE = 40;
     static const int GUIDER_DOT_SIZE = 4;
     static const int PAWN_SIZE = 25;
-    static const int DICE_SIZE = 140;
+    static const int DICE_SIZE = 100;
     static const int STROKE_WIDTH = 2;
     static const int ANIMATION_DURATION = 120;
     static const int DICE_ANIMATION_DURATION = 800;

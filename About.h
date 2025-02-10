@@ -1,4 +1,3 @@
-/* This file helps creating about application dialog */
 #ifndef ABOUT_H
 #define ABOUT_H
 
