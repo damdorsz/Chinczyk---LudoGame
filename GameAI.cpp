@@ -13,21 +13,21 @@ GameAI::GameAI(Game* game)
 }
 
 Pawn* GameAI::makeMove(int diceValue) {
-    qDebug() << "AI rzuca kostką, wynik:" << diceValue;
+    qDebug() << "AI throws the dice, the result:" << diceValue;
     QVector<Pawn*> playablePawns = mGame->getPlayablePawns(diceValue);
 
     if (playablePawns.isEmpty()) {
-        qDebug() << "Brak dostępnych pionków do ruchu. AI kończy turę.";
+        qDebug() << "No pawns available to move. AI ends the turn.";
         return nullptr;
     }
 
     Pawn* selectedPawn = selectBestMove(playablePawns, diceValue);
     if (selectedPawn == nullptr) {
-        qDebug() << "AI nie znalazło pionka do ruchu. Tura kończy się.";
+        qDebug() << "AI has not found a pawn to move. The turn ends.";
         return nullptr;
     }
 
-    qDebug() << "AI wybrało pionek:" << (int)selectedPawn->getColor();
+    qDebug() << "AI has chosen the pawn:" << (int)selectedPawn->getColor();
     return selectedPawn;
 }
 
@@ -35,7 +35,7 @@ Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
 
     for (Pawn* pawn : pawns) {
         if (pawn->isAtHome() && diceValue == 6) {
-            qDebug() << "AI wychodzi z domku pionkiem:" << (int )pawn->getColor();
+            qDebug() << "AI exits the house with a pawn:" << (int )pawn->getColor();
             return pawn;
         }
     }
@@ -48,8 +48,8 @@ Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
 
             for (Pawn* targetPawn : pawnsAtTarget) {
                 if (targetPawn->getColor() != pawn->getColor()) {
-                    qDebug() << "AI zbija pionka przeciwnika:" << (int ) targetPawn->getColor();
-                    return pawn; // Znaleziono pionek do zbicia
+                    qDebug() << "AI knocks down the opponent's pawn:" << (int ) targetPawn->getColor();
+                    return pawn;
                 }
             }
         }
@@ -69,11 +69,11 @@ Pawn* GameAI::selectBestMove(const QVector<Pawn*>& pawns, int diceValue) {
     }
 
     if (bestPawn) {
-        qDebug() << "AI wybiera pionka najbliżej mety:" << (int ) bestPawn->getColor();
+        qDebug() << "AI chooses the pawn closest to the finish line:" << (int ) bestPawn->getColor();
         return bestPawn;
     }
 
-    qDebug() << "AI wybiera pierwszy dostępny pionek:" << (int )pawns.first()->getColor();
+    qDebug() << "AI selects the first available pawn:" << (int )pawns.first()->getColor();
     return pawns.first();
 }
 

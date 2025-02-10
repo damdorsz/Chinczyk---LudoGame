@@ -2,7 +2,7 @@
 
 #include <GameWindow.h>
 
-GameScreen::GameScreen(GameWindow *parent,QVector<PlayerColor> tablicaGraczyKolor) : QWidget(parent),tabGraczyKolor(tablicaGraczyKolor) {}
+GameScreen::GameScreen(GameWindow *parent, const QVector<PlayerColor> &coloursPlayers) : QWidget(parent),coloursPlayers(coloursPlayers) {}
 
 GameScreen::~GameScreen() {}
 
@@ -31,34 +31,34 @@ void GameScreen::paintEvent(QPaintEvent*) {
     drawGuidePaths(painter);
 }
 
-QColor GameScreen::whichColour(PlayerColor szukanyKolor)
+QColor GameScreen::whichColour(PlayerColor searchColour)
 {
-    if(szukanyKolor == PlayerColor::RED)
+    if(searchColour == PlayerColor::RED)
         return QColor (255,0,0);
-    if(szukanyKolor == PlayerColor::BLUE)
+    if(searchColour == PlayerColor::BLUE)
         return QColor (0,0,255);
-    if(szukanyKolor == PlayerColor::YELLOW)
+    if(searchColour == PlayerColor::YELLOW)
         return QColor (255,255,0);
-    if(szukanyKolor == PlayerColor::GREEN)
+    if(searchColour == PlayerColor::GREEN)
         return QColor (0,255,0);
-    if(szukanyKolor == PlayerColor::WHITE)
+    if(searchColour == PlayerColor::WHITE)
         return QColor (0,0,0);
 }
 
 void GameScreen::drawHomes(QPainter &painter) {
-    QBrush tlBrush (whichColour(tabGraczyKolor[0]));
+    QBrush tlBrush (whichColour(coloursPlayers[0]));
     painter.setBrush(tlBrush);
     painter.drawRect(painthelp::getTopLeftHomeRect());
 
-    QBrush trBrush (whichColour(tabGraczyKolor[2]));
+    QBrush trBrush (whichColour(coloursPlayers[2]));
     painter.setBrush(trBrush);
     painter.drawRect(painthelp::getTopRightHomeRect());
 
-    QBrush brBrush (whichColour(tabGraczyKolor[1]));
+    QBrush brBrush (whichColour(coloursPlayers[1]));
     painter.setBrush(brBrush);
     painter.drawRect(painthelp::getBottomRightHomeRect());
 
-    QBrush blBrush (whichColour(tabGraczyKolor[3]));
+    QBrush blBrush (whichColour(coloursPlayers[3]));
     painter.setBrush(blBrush);
     painter.drawRect(painthelp::getBottomLeftHomeRect());
 
@@ -69,7 +69,7 @@ void GameScreen::drawHomes(QPainter &painter) {
 
 void GameScreen::drawGuidePaths(QPainter &painter) {
     QPoint topLeft {0, 4}; //
-    painter.setBrush(whichColour(tabGraczyKolor[0]));
+    painter.setBrush(whichColour(coloursPlayers[0]));
     painter.drawEllipse(painthelp::getCellRect(topLeft).center(), GameWindow::GUIDER_DOT_SIZE, GameWindow::GUIDER_DOT_SIZE);
     topLeft = painthelp::pointBelow(topLeft);
     topLeft = painthelp::pointRight(topLeft);
@@ -80,7 +80,7 @@ void GameScreen::drawGuidePaths(QPainter &painter) {
     }
 
     QPoint topRight {6, 0};
-    painter.setBrush(whichColour(tabGraczyKolor[2]));
+    painter.setBrush(whichColour(coloursPlayers[2]));
     painter.drawEllipse(painthelp::getCellRect(topRight).center(), GameWindow::GUIDER_DOT_SIZE, GameWindow::GUIDER_DOT_SIZE);
     topRight = painthelp::pointLeft(topRight);
     topRight = painthelp::pointBelow(topRight);
@@ -91,7 +91,7 @@ void GameScreen::drawGuidePaths(QPainter &painter) {
     }
 
     QPoint bottomRight {10, 6};
-    painter.setBrush(whichColour(tabGraczyKolor[1]));
+    painter.setBrush(whichColour(coloursPlayers[1]));
     painter.drawEllipse(painthelp::getCellRect(bottomRight).center(), GameWindow::GUIDER_DOT_SIZE, GameWindow::GUIDER_DOT_SIZE);
     bottomRight = painthelp::pointAbove(bottomRight);
     bottomRight = painthelp::pointLeft(bottomRight);
@@ -102,7 +102,7 @@ void GameScreen::drawGuidePaths(QPainter &painter) {
     }
 
     QPoint bottomLeft {4, 10};
-    painter.setBrush(whichColour(tabGraczyKolor[3]));
+    painter.setBrush(whichColour(coloursPlayers[3]));
     painter.drawEllipse(painthelp::getCellRect(bottomLeft).center(), GameWindow::GUIDER_DOT_SIZE, GameWindow::GUIDER_DOT_SIZE);
     bottomLeft = painthelp::pointRight(bottomLeft);
     bottomLeft = painthelp::pointAbove(bottomLeft);

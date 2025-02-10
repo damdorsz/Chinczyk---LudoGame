@@ -23,27 +23,25 @@ const QColor GameWindow::COLOR_YELLOW_LIGHT = QColor (255,250,153);
 const QColor GameWindow::COLOR_BLUE_LIGHT = QColor (99,218,220);
 const QColor GameWindow::COLOR_GREEN_LIGHT = QColor (148,237,148);
 
-GameWindow::GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy, QVector<PlayerColor> tablicaGraczyKolor, QVector<QString> tablicaModeGamers) :
-    mGame {new Game(players_count,tablicaGraczyKolor,tablicaModeGamers)},
+GameWindow::GameWindow(unsigned int players_count,const QVector<QString>& playersNames,const QVector<PlayerColor>& playersColours, const QVector<QString>& playerModes) :
+    mGame {new Game(players_count,playersColours,playerModes)},
     mBoard {mGame->getGameBoard()},
     state {ROLLING},
-    mScreen (new GameScreen(this, tablicaGraczyKolor)),
+    mScreen (new GameScreen(this, playersColours)),
     footer {new QWidget(this)},
     footerLayout {new QVBoxLayout()},
     dice {new Dice(nullptr, 6)},
     hintLabel {new QLabel()},
-    mGraczyKolor(tablicaGraczyKolor),
-    mNazwGraczy(tablicaNazwGraczy){
+    mPlayersColours(playersColours),
+    mPlayersNames(playersNames){
 
     init();
 }
 
 
 void GameWindow::init() {
-
     this->setCentralWidget(this->mScreen);
     this->setWindowTitle("Ludo Game by Damian Dorsz & Damian Zimnol");
-
     QMenuBar *menuBar = this->menuBar();
     QMenu *gameMenu = menuBar->addMenu("&Game");
     gameMenu->addSeparator();
@@ -52,26 +50,47 @@ void GameWindow::init() {
     connect(aboutAction, &QAction::triggered, this, &GameWindow::aboutRequested);
     connect(exitAction, &QAction::triggered, this, &GameWindow::exitRequested);
 
-    dice->setVisualSize(DICE_SIZE);
-    hintLabel->setFixedHeight(CELL_SIZE);
+    // Double the dice size and triple the width
+    dice->setVisualSize(DICE_SIZE *2);
+    dice->setFixedWidth(dice->width() * 2);
 
-    footer->setFixedSize(CELL_SIZE * 5, dice->height()+hintLabel->height());
-    footer->move((CELL_SIZE * 12),
-        BOARD_BOUND + (this->height() / 4));
 
-    hintLabel->setWordWrap(true);
-    dice->setColor(COLOR_RED_LIGHT);
+    footer->setFixedSize(
+        CELL_SIZE * 5 * 4,  // Szerokość
+        dice->height()  + (CELL_SIZE / 20)  // Mniejsza wysokość
+        );
+
+    footer->move(
+        (CELL_SIZE * 9),  // Poziome położenie
+        BOARD_BOUND + (this->height() / 30)  // Znacznie bliżej górnej krawędzi planszy
+        );
+
+    // Ustawienia etykiety
     hintLabel->setFixedWidth(footer->geometry().width());
+    hintLabel->setWordWrap(true);
     hintLabel->setAlignment(Qt::AlignCenter);
 
+    // Duża, pogrubiona czcionka
+    QFont labelFont = hintLabel->font();
+    labelFont.setPointSize(labelFont.pointSize() * 3);
+    labelFont.setBold(true);
+    hintLabel->setFont(labelFont);
+
+    dice->setColor(COLOR_RED_LIGHT);
+
+    // Układ stopki - kostka na górze, etykieta pod nią
     footerLayout->addWidget(dice, 0, Qt::AlignCenter);
     footerLayout->addWidget(hintLabel, 0, Qt::AlignCenter);
+    footerLayout->setContentsMargins(0, 0, 0, 0);
+    footerLayout->setSpacing(1);
     footer->setLayout(footerLayout);
 
+
+    // Dostosowanie rozmiaru ekranu
     this->mScreen->setFixedSize(
-        (BOARD_BOUND * 2) + (CELL_SIZE * 15) + footer->width(),
+        (BOARD_BOUND * 2) + (CELL_SIZE * 16) + footer->width() /2,
         (BOARD_BOUND * 2) + (CELL_SIZE * 11)
-    );
+        );
 
     QObject::connect(dice, SIGNAL(clicked()), this, SLOT(rollDiceClicked()));
 
@@ -95,20 +114,23 @@ GameWindow::~GameWindow() {
 
 
 QString GameWindow::getUserName(PlayerColor color) {
-    if(mGraczyKolor[0] == color)
+    if(mPlayersColours[0] == color)
     {
-        return mNazwGraczy[0];
-    } else if (mGraczyKolor[1] == color)
-    {
-        return mNazwGraczy[1];
-    } else if (mGraczyKolor[2] == color)
-    {
-        return mNazwGraczy[2];
-    } else if (mGraczyKolor[3] == color)
-    {
-        return mNazwGraczy[3];
+        return mPlayersNames[0];
     }
-    return "Nieznany gracz";
+    else if (mPlayersColours[1] == color)
+    {
+        return mPlayersNames[1];
+    }
+    else if (mPlayersColours[2] == color)
+    {
+        return mPlayersNames[2];
+    }
+    else if (mPlayersColours[3] == color)
+    {
+        return mPlayersNames[3];
+    }
+    return "Unknown player";
 }
 
 void GameWindow::updateUi() {
@@ -232,7 +254,7 @@ void GameWindow::diceAnimationFinished() {
 
             if (selectedPawn) {
                 pawnChosen(selectedPawn);
-                qDebug() << "GameWindow: AI wykonało ruch pionkiem:" << (int)selectedPawn->getColor();
+                qDebug() << "GameWindow: AI made a move with a pawn:" << (int)selectedPawn->getColor();
             } else {
                 mGame->changeCurrentPlayer();
                 state = ROLLING;
@@ -259,8 +281,8 @@ void GameWindow::pawnChosen(Pawn *p) {
 
     qDebug() << "mGame->getLastDiceValue()" << mGame->getLastDiceValue();
     qDebug() << "Pawn::getRelPosition() == " << p->getRelPosition();
-    needs_to_save = true; //Changes made to game
-    p->raise(); //So that it is visible on top
+    needs_to_save = true;
+    p->raise();
     movePawnVisual(p, mGame->predictRel(p, mGame->getLastDiceValue()));
 }
 
@@ -326,16 +348,16 @@ void GameWindow::pawnClashed(Pawn *p) {
     p->changePosition(Pawn::HOME);
     PlayerColor color = p->getColor();
     int which = 0;
-    if(mGraczyKolor[0] == color)
+    if(mPlayersColours[0] == color)
     {
         which = 1;
-    } else if (mGraczyKolor[1] == color)
+    } else if (mPlayersColours[1] == color)
     {
         which = 2;
-    } else if (mGraczyKolor[2] == color)
+    } else if (mPlayersColours[2] == color)
     {
         which = 3;
-    } else if (mGraczyKolor[3] == color)
+    } else if (mPlayersColours[3] == color)
     {
         which = 4;
     }
@@ -358,7 +380,7 @@ void GameWindow::closeEvent(QCloseEvent* event) {
     QMessageBox dialog {};
     dialog.setIcon(QMessageBox::Question);
     dialog.setText("Confirm exit");
-    dialog.setInformativeText("Would you like to save the game before exiting?");
+    dialog.setInformativeText("Do you really want to close the game?");
 
     dialog.addButton(QMessageBox::Close);
     dialog.addButton(QMessageBox::Cancel);

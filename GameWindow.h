@@ -54,12 +54,12 @@ public:
     static const int CELL_SIZE = 40;
     static const int GUIDER_DOT_SIZE = 4;
     static const int PAWN_SIZE = 25;
-    static const int DICE_SIZE = 120;
+    static const int DICE_SIZE = 140;
     static const int STROKE_WIDTH = 2;
     static const int ANIMATION_DURATION = 120;
     static const int DICE_ANIMATION_DURATION = 800;
     static const int DICE_SHAKE_DISTANCE = 25;
-    explicit GameWindow(unsigned int players_count, QVector<QString> tablicaNazwGraczy , QVector<PlayerColor> tablicaGraczy,QVector<QString> tablicaModeGamers);
+    explicit GameWindow(unsigned int players_count, const QVector<QString> &playersNames , const QVector<PlayerColor> &playersColours, const QVector<QString> &playerModes);
 
     ~GameWindow();
     QString getUserName(PlayerColor color);
@@ -86,8 +86,8 @@ private:
     Game *mGame {};
     Board *mBoard {};
     GameState state {};
-    QVector<QString> mNazwGraczy;
-    QVector<PlayerColor> mGraczyKolor;
+    QVector<QString> mPlayersNames;
+    QVector<PlayerColor> mPlayersColours;
     GameScreen *mScreen {};
     QWidget *footer {};
     QVBoxLayout *footerLayout {};

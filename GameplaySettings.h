@@ -23,16 +23,16 @@ public:
     explicit GameplaySettings(QWidget *parent = nullptr);
     ~GameplaySettings();
 
-    void ustawienieKolorowDomyslne();
+    void settingColoursDefault();
     void updateAvailableColors();
     void updateControlsForP3(int state);
     void updateControlsForP4(int state);
     void validateSettings();
 
     int getPlayers()const{return m_players;}
-    QVector<PlayerColor> getPlayerColors() const{return m_playerColors;}
-    QVector<QString> getNamePlayers() const{return m_namePlayers;}
-    QVector<QString> getPlayerModes() const{return  m_playerModes;}
+    QVector<PlayerColor> getPlayerColors() const;
+    QVector<QString> getNamePlayers() const ;
+    QVector<QString> getPlayerModes() const ;
 
 private:
     Ui::GameplaySettings *ui;

@@ -33,7 +33,8 @@ GameplaySettings::GameplaySettings(QWidget *parent)
             connect(comboBox, &QComboBox::currentIndexChanged, this, &GameplaySettings::updateAvailableColors);
         }
     }
-    ustawienieKolorowDomyslne();
+    this->setWindowTitle("Ludo Game gameplay settings");
+    settingColoursDefault();
 }
 
 GameplaySettings::~GameplaySettings()
@@ -41,7 +42,19 @@ GameplaySettings::~GameplaySettings()
     delete ui;
 }
 
-void GameplaySettings::ustawienieKolorowDomyslne()
+QVector<PlayerColor> GameplaySettings::getPlayerColors() const {
+    return m_playerColors;
+}
+
+QVector<QString> GameplaySettings::getNamePlayers() const {
+    return m_namePlayers;
+}
+
+QVector<QString> GameplaySettings::getPlayerModes() const {
+    return  m_playerModes;
+}
+
+void GameplaySettings::settingColoursDefault()
 {
     QVector<QString> colors = {"Red", "Blue", "Green", "Yellow"};
     for (int licznik = 1; licznik <= 4; licznik++) {
@@ -49,10 +62,9 @@ void GameplaySettings::ustawienieKolorowDomyslne()
         QComboBox *comboBox = findChild<QComboBox*>(nazwaComboBoxa);
 
         if (comboBox) {
-            comboBox->clear();  // Czyść poprzednie elementy
-            comboBox->addItem("-");  // Opcja domyślna
+            comboBox->clear();
+            comboBox->addItem("-");
 
-            // Dodawanie pozostałych kolorów
             for (const auto& color : colors) {
                 comboBox->addItem(color);
             }
@@ -136,46 +148,40 @@ void GameplaySettings::updateControlsForP4(int state)
 }
 
 void GameplaySettings::validateSettings() {
-
     QVector<QString> namePlayers;
-    QVector<PlayerColor> playerColors = {PlayerColor::WHITE,PlayerColor::WHITE,PlayerColor::WHITE,PlayerColor::WHITE};
+    QVector<PlayerColor> playerColors = {PlayerColor::WHITE, PlayerColor::WHITE, PlayerColor::WHITE, PlayerColor::WHITE};
     QVector<QString> playerModes;
     int numberOfPlayers = 0;
 
     for (int i = 1; i <= 4; i++) {
-
-        QString checkBoxName = QString("checkBoxP%1").arg(i);
-        QCheckBox *checkBox = findChild<QCheckBox *>(checkBoxName);
-
-        if ((i >= 3 && checkBox && !checkBox->isChecked())) {
+        if (i >= 3 && !findChild<QCheckBox*>(QString("checkBoxP%1").arg(i))->isChecked()) {
             continue;
         }
 
-        QString comboName = QString("comboBoxP%1").arg(i);
-        QComboBox *comboBox = findChild<QComboBox *>(comboName);
-
+        QComboBox* comboBox = findChild<QComboBox*>(QString("comboBoxP%1").arg(i));
         if (comboBox) {
             QString selectedColor = comboBox->currentText();
             if (selectedColor == "-") {
-                QMessageBox::warning(this, "Invalid Selection",
-                                     QString("Please select a color"));
+                QMessageBox::warning(this, "Invalid Selection", "Please select a color");
                 return;
             }
-            if(selectedColor == "Red")
-                playerColors[i - 1] = PlayerColor::RED;
-            if(selectedColor == "Yellow")
-                playerColors[i - 1] = PlayerColor::YELLOW;
-            if(selectedColor == "Green")
-                playerColors[i - 1] = PlayerColor::GREEN;
-            if(selectedColor == "Blue")
-                playerColors[i - 1] = PlayerColor::BLUE;
+
+
+            static const QMap<QString, PlayerColor> colorMap = {
+                {"Red", PlayerColor::RED},
+                {"Yellow", PlayerColor::YELLOW},
+                {"Green", PlayerColor::GREEN},
+                {"Blue", PlayerColor::BLUE}
+            };
+            playerColors[i - 1] = colorMap.value(selectedColor, PlayerColor::WHITE);
         }
 
-        if(i == 1){
-            playerModes.append("HUMAN");
+        QString playerMode;
+        if (i == 1) {
+            playerMode = "HUMAN";
         } else {
             QButtonGroup* currentGroup = nullptr;
-            switch(i) {
+            switch (i) {
             case 2: currentGroup = buttonGroupP2; break;
             case 3: currentGroup = buttonGroupP3; break;
             case 4: currentGroup = buttonGroupP4; break;
@@ -188,33 +194,24 @@ void GameplaySettings::validateSettings() {
                                          QString("Please select a game mode for Player %1").arg(i));
                     return;
                 }
-                playerModes.append(selectedButton->text());
+                playerMode = selectedButton->text();
             }
         }
+        playerModes.append(playerMode);
 
-        QString lineEditName = QString("lineEditP%1").arg(i);
-        QLineEdit *lineEdit = findChild<QLineEdit *>(lineEditName);
-
+        QLineEdit* lineEdit = findChild<QLineEdit*>(QString("lineEditP%1").arg(i));
         if (lineEdit) {
-            QString namePlayer = lineEdit->text();
-            if (namePlayer == "") {
-                QMessageBox::warning(this, "Invalid Selection",
-                                     QString("Please write a name player"));
+            QString namePlayer = lineEdit->text().trimmed();
+            if (namePlayer.isEmpty()) {
+                QMessageBox::warning(this, "Invalid Selection", "Please write a player name");
                 return;
             }
-            else {
-                namePlayers.append(namePlayer);
-            }
+            namePlayers.append(namePlayer);
         }
     }
 
-    if (ui->checkBoxP4->isChecked()) {
-        numberOfPlayers = 4;
-    } else if (ui->checkBoxP3->isChecked()) {
-        numberOfPlayers = 3;
-    } else {
-        numberOfPlayers = 2;
-    }
+    numberOfPlayers = ui->checkBoxP4->isChecked() ? 4 :
+                          ui->checkBoxP3->isChecked() ? 3 : 2;
 
     m_players = numberOfPlayers;
     m_playerColors = playerColors;
@@ -222,4 +219,5 @@ void GameplaySettings::validateSettings() {
     m_playerModes = playerModes;
     accept();
 }
+
 

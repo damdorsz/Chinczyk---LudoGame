@@ -31,11 +31,11 @@ void startClick(Ui::WelcomeWindow &ui, QMainWindow &welcomeWindow) {
     GameplaySettings *m_gameplaySettings = new GameplaySettings();
     if (m_gameplaySettings->exec() == QDialog::Accepted) {
         unsigned int players = m_gameplaySettings->getPlayers();
-        QVector<PlayerColor> tablicaKolorowGraczy = m_gameplaySettings->getPlayerColors();
-        QVector<QString> tablicaNazwGraczy = m_gameplaySettings->getNamePlayers();
-        QVector<QString> tablicaModeGamers = m_gameplaySettings->getPlayerModes();
+        QVector<PlayerColor> playersColours = m_gameplaySettings->getPlayerColors();
+        QVector<QString> playersNames = m_gameplaySettings->getNamePlayers();
+        QVector<QString> playerModes = m_gameplaySettings->getPlayerModes();
         if (players > 0) {
-            gameWin = new GameWindow(players,tablicaNazwGraczy,tablicaKolorowGraczy,tablicaModeGamers);
+            gameWin = new GameWindow(players,playersNames,playersColours,playerModes);
             gameWin->show();
             welcomeWindow.close();
             QObject::connect(gameWin, &GameWindow::exit, gameWin, [gameWin]() {

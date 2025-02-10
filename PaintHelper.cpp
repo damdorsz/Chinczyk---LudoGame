@@ -98,22 +98,22 @@ QVector<QRect> getHomeCircleRects() {
     };
 }
 
-QRect getPawnHomePosGeometry(PlayerColor color, int which, int numerGracza) {
+QRect getPawnHomePosGeometry(PlayerColor color, int which, int playerNumber) {
 
     if (which < 1 || which > 4) {
         qDebug() << "Invalid which value:" << which;
         which = 1;
     }
 
-    if (numerGracza < 1 || numerGracza > 4) {
-        qDebug() << "Invalid numerGracza value:" << numerGracza;
-        numerGracza = 1;
+    if (playerNumber < 1 || playerNumber > 4) {
+        qDebug() << "Invalid numerGracza value:" << playerNumber;
+        playerNumber = 1;
     }
 
     QVector<QRect> v = getHomeCircleRects();
 
     int baseIndex = 0;
-    switch (numerGracza) {
+    switch (playerNumber) {
     case 1:
         baseIndex = 0;
         break;
@@ -127,7 +127,7 @@ QRect getPawnHomePosGeometry(PlayerColor color, int which, int numerGracza) {
         baseIndex = 12;
         break;
     default:
-        qDebug() << "Unexpected numerGracza value:" << numerGracza;
+        qDebug() << "Unexpected numerGracza value:" << playerNumber;
         return v[0];
     }
 
@@ -142,7 +142,7 @@ QRect getPawnHomePosGeometry(PlayerColor color, int which, int numerGracza) {
     qDebug() << "getPawnHomePosGeometry:"
              << "color:" << static_cast<int>(color)
              << "which:" << which
-             << "numerGracza:" << numerGracza
+             << "player number:" << playerNumber
              << "baseIndex:" << baseIndex
              << "finalIndex:" << finalIndex;
 

@@ -15,15 +15,15 @@ class GameScreen : public QWidget {
 Q_OBJECT;
 
 public:
-    explicit GameScreen(GameWindow *parent,QVector<PlayerColor> tablicaGraczyKolor);
+    explicit GameScreen(GameWindow *parent,const QVector<PlayerColor>& coloursPlayers);
 
     virtual ~GameScreen();
 
 private:
     void drawHomes(QPainter &painter);
     void drawGuidePaths(QPainter &painter);
-    QColor whichColour(PlayerColor szukanyKolor);
-    QVector<PlayerColor> tabGraczyKolor;
+    QColor whichColour(PlayerColor searchColour);
+    QVector<PlayerColor> coloursPlayers;
 
 protected:
     virtual void paintEvent(QPaintEvent*);

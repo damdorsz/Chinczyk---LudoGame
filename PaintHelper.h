@@ -19,7 +19,7 @@ QRect getBottomLeftHomeRect();
 QRect getDestRect();
 QRect shiftToCenter(QRect it);
 QVector<QRect> getHomeCircleRects();
-QRect getPawnHomePosGeometry(PlayerColor color, int which,int numerGracza);
+QRect getPawnHomePosGeometry(PlayerColor color, int which, int playerNumber);
 QRect getPawnDestGeometry(PlayerColor,QVector<PlayerColor> colorPlayer);
 QRect getPawnDestGeometry(Pawn*);
 QRect getPawnGeometry(QRect cellRect);
